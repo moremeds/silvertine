@@ -1,0 +1,48 @@
+# Development environment configuration for Silvertine trading system
+# Copy this file to development.yaml and customize for your environment
+
+# General settings
+debug: true
+log_level: DEBUG
+environment: development
+
+# Event system configuration
+event_bus:
+  redis_url: "redis://localhost:6379"
+  stream_name: "silvertine:events:dev"
+  consumer_group: "silvertine-dev"
+  max_stream_length: 10000
+  
+# Database configuration
+database:
+  url: "sqlite:///cache/sqlite/silvertine_dev.db"
+  echo: true  # Log SQL queries in development
+  pool_size: 5
+  max_overflow: 10
+
+# API configuration
+api:
+  host: "127.0.0.1"
+  port: 8000
+  reload: true  # Auto-reload on code changes
+  cors_origins:
+    - "http://localhost:3000"
+    - "http://127.0.0.1:3000"
+
+# Cache settings
+cache:
+  redis_url: "redis://localhost:6379"
+  default_ttl: 300  # 5 minutes
+  max_memory_policy: "allkeys-lru"
+
+# TUI interface settings
+tui:
+  update_interval: 0.1  # seconds
+  max_log_lines: 1000
+  theme: "dark"
+
+# Performance settings
+performance:
+  max_concurrent_events: 100
+  event_processing_timeout: 5.0  # seconds
+  order_execution_timeout: 10.0  # seconds

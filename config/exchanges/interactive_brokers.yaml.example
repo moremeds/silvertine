@@ -1,0 +1,92 @@
+# Interactive Brokers configuration for Silvertine trading system
+# Copy this file to interactive_brokers.yaml and customize for your setup
+
+# Exchange identification
+name: "interactive_brokers"
+display_name: "Interactive Brokers"
+enabled: false  # Enable when ready to use
+paper_trading: true
+
+# Connection configuration
+connection:
+  host: "127.0.0.1"
+  port: 7497  # 7497 for paper trading, 7496 for live
+  client_id: 1
+  timeout: 60  # seconds
+  
+# Account configuration
+account:
+  # Leave empty for demo account or specify your paper trading account
+  account_id: ""  # Will use default demo account if empty
+  currency: "USD"
+
+# Trading configuration
+trading:
+  default_order_type: "LMT"  # Limit order
+  supported_order_types:
+    - "MKT"   # Market
+    - "LMT"   # Limit
+    - "STP"   # Stop
+    - "STP LMT"  # Stop Limit
+    - "TRAIL"    # Trailing Stop
+  
+  # Order validation
+  validate_orders: true
+  what_if_orders: true  # Test orders before submission
+
+# Market data configuration
+market_data:
+  # Generic tick types for real-time data
+  tick_types:
+    - "LAST"
+    - "BID"
+    - "ASK"
+    - "VOLUME"
+    - "HIGH"
+    - "LOW"
+    - "CLOSE"
+  
+  # Historical data settings
+  historical:
+    duration: "1 D"  # Default duration for historical requests
+    bar_size: "1 min"  # Default bar size
+    what_to_show: "TRADES"  # TRADES, MIDPOINT, BID, ASK
+    use_rth: true  # Regular trading hours only
+    
+  # Instruments to track
+  instruments:
+    - symbol: "SPY"
+      sec_type: "STK"
+      exchange: "SMART"
+      currency: "USD"
+    - symbol: "QQQ"
+      sec_type: "STK"
+      exchange: "SMART"
+      currency: "USD"
+    - symbol: "EUR"
+      sec_type: "CASH"
+      exchange: "IDEALPRO"
+      currency: "USD"
+
+# Connection management
+connection_management:
+  auto_reconnect: true
+  reconnect_delay: 5  # seconds
+  max_reconnect_attempts: 10
+  keep_alive_interval: 300  # seconds
+
+# Error handling
+error_handling:
+  max_api_errors: 5  # Before disconnecting
+  error_cooldown: 60  # seconds
+  
+# Logging
+logging:
+  log_api_messages: true
+  log_level: "INFO"  # DEBUG, INFO, WARNING, ERROR
+
+# Performance settings
+performance:
+  max_pending_orders: 50
+  request_timeout: 30  # seconds
+  max_concurrent_requests: 10

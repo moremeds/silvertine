@@ -1,0 +1,80 @@
+# Binance Testnet configuration for Silvertine trading system
+# Copy this file to binance_testnet.yaml and add your credentials
+
+# Exchange identification
+name: "binance_testnet"
+display_name: "Binance Testnet"
+enabled: true
+testnet: true
+
+# API endpoints
+endpoints:
+  base_url: "https://testnet.binance.vision"
+  websocket_url: "wss://testnet.binance.vision/ws"
+  api_version: "v3"
+
+# Authentication (set via environment variables)
+# BINANCE_TESTNET_API_KEY=your_api_key_here
+# BINANCE_TESTNET_SECRET_KEY=your_secret_key_here
+auth:
+  api_key_env: "BINANCE_TESTNET_API_KEY"
+  secret_key_env: "BINANCE_TESTNET_SECRET_KEY"
+
+# Rate limiting configuration
+rate_limits:
+  requests_per_minute: 1200
+  orders_per_second: 10
+  orders_per_day: 200000
+  weight_per_minute: 1200
+  
+# Trading configuration
+trading:
+  default_order_type: "LIMIT"
+  supported_order_types:
+    - "MARKET"
+    - "LIMIT"
+    - "STOP_LOSS"
+    - "STOP_LOSS_LIMIT"
+    - "TAKE_PROFIT"
+    - "TAKE_PROFIT_LIMIT"
+  
+  # Minimum order values
+  min_order_value: 10.0  # USDT
+  min_quantity_precision: 8
+  min_price_precision: 8
+
+# WebSocket configuration
+websocket:
+  ping_interval: 180  # seconds
+  reconnect_delay: 5  # seconds
+  max_reconnect_attempts: 10
+  buffer_size: 1024
+
+# Market data configuration
+market_data:
+  symbols:
+    - "BTCUSDT"
+    - "ETHUSDT"
+    - "ADAUSDT"
+    - "DOTUSDT"
+  
+  # Kline intervals for strategy data
+  kline_intervals:
+    - "1m"
+    - "5m"
+    - "15m"
+    - "1h"
+    - "4h"
+    - "1d"
+
+# Paper trading simulation
+paper_trading:
+  initial_balance: 10000.0  # USDT
+  commission_rate: 0.001  # 0.1%
+  slippage_bps: 5  # 5 basis points
+  
+# Connection timeouts
+timeouts:
+  connect: 10.0  # seconds
+  read: 30.0  # seconds
+  request: 30.0  # seconds

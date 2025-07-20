@@ -1,0 +1,157 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+dev-debug.log
+
+# Dependency directories
+node_modules/
+
+# Environment variables
+.env
+
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS specific
+.DS_Store
+
+scrapyard/
+
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+dev-debug.log
+
+# Dependency directories
+node_modules/
+
+# Python virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Python cache and build files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS specific
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# Temporary files
+temp_logs/
+*.tmp
+*.bak
+temp/
+
+# Generated test outputs
+*_results/
+paper_trading_results/
+coverage.json
+
+
+# SQLite temporary files
+:memory:*
+*.db-journal
+*.db-wal
+*.db-shm
+
+# Generated reports
+*_REPORT.md
+*_SUMMARY.md
+CLEANUP_REPORT.md
+
+# Coverage reports (already included but being explicit)
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+
+# IDE specific
+.mypy_cache/
+.ruff_cache/
+
+# Runtime data and cache (Silvertine-specific)
+cache/
+*.db
+*.sqlite
+*.sqlite3
+
+# Sensitive configuration files
+config/**/*.yaml
+config/**/*.yml
+config/**/*.json
+!config/**/*.example
+!config/**/*.template

@@ -1,0 +1,16 @@
+{
+    "mcpServers": {
+      "task-master-ai": {
+        "command": "npx",
+        "args": ["-y", "--package=task-master-ai", "task-master-ai"],
+        "env": {
+          "ANTHROPIC_API_KEY": "${ANTHROPIC_API_KEY}",
+          "OPENAI_API_KEY": "${OPENAI_API_KEY}"
+        }
+      },
+      "sequential-thinking": {
+        "command": "npx",
+        "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"]
+      }
+    }
+  }

@@ -1,0 +1,43 @@
+# Task ID: 2
+# Title: Implement Event-Driven Core Engine
+# Status: pending
+# Dependencies: 1
+# Priority: high
+# Description: Develop the core event-driven engine using asyncio and Redis Streams.
+# Details:
+Utilize Python's asyncio library to create an event loop. Implement Redis Streams for event persistence and replay. Define four core event types: MarketDataEvent, OrderEvent, FillEvent, SignalEvent. Ensure events are processed in order and are idempotent.
+
+# Test Strategy:
+Create unit tests for event handling and integration tests to verify event persistence and replay functionality.
+
+# Subtasks:
+## 1. Design Event System Architecture and Base Classes [pending]
+### Dependencies: None
+### Description: Create the foundational event system architecture with abstract base classes and interfaces for the four core event types (MarketDataEvent, OrderEvent, FillEvent, SignalEvent) using Python's asyncio library.
+### Details:
+Define abstract base Event class with common attributes (event_id, timestamp, event_type). Create concrete event classes for MarketDataEvent (symbol, price, volume, bid/ask), OrderEvent (order_id, symbol, direction, quantity, order_type), FillEvent (order_id, symbol, executed_qty, executed_price, commission), and SignalEvent (symbol, signal_type, strength, strategy_id). Implement event serialization/deserialization methods for Redis persistence. Use dataclasses or Pydantic models for type safety and validation.
+
+## 2. Implement Redis Streams Integration Layer [pending]
+### Dependencies: 2.1
+### Description: Develop the Redis Streams integration layer for event persistence, including connection management, stream creation, and event publishing/consuming mechanisms.
+### Details:
+Create RedisStreamManager class to handle Redis connection pooling using aioredis. Implement methods for creating streams (one per event type), publishing events with XADD command, consuming events with XREAD/XREADGROUP, and managing consumer groups. Add connection retry logic with exponential backoff. Implement event replay functionality using XRANGE for historical event retrieval. Configure Redis persistence settings (AOF/RDB) for durability.
+
+## 3. Build Asyncio Event Bus Core [pending]
+### Dependencies: 2.1, 2.2
+### Description: Implement the central asyncio-based event bus that coordinates event flow between components, ensuring ordered processing and idempotent event handling.
+### Details:
+Create EventBus class using asyncio.Queue for in-memory event buffering. Implement publish() and subscribe() methods with topic-based routing. Add event handler registration with priority support. Ensure FIFO ordering within each event type using separate queues. Implement idempotency by tracking processed event IDs in a time-windowed cache. Add circuit breaker pattern for failing handlers. Create event processing metrics (throughput, latency, error rates).
+
+## 4. Develop Event Processing Pipeline [pending]
+### Dependencies: 2.2, 2.3
+### Description: Create the event processing pipeline that consumes events from Redis Streams and routes them through the asyncio event bus to registered handlers.
+### Details:
+Implement EventProcessor class that bridges Redis Streams and the asyncio event bus. Create separate asyncio tasks for each event stream consumer. Implement backpressure handling to prevent memory overflow. Add event transformation and validation before routing. Implement dead letter queue for failed events. Create event processing checkpoints for recovery. Add graceful shutdown handling with in-flight event completion.
+
+## 5. Implement Event Monitoring and Replay System [pending]
+### Dependencies: 2.3, 2.4
+### Description: Build comprehensive event monitoring, debugging tools, and replay functionality for historical event processing and system recovery.
+### Details:
+Create EventMonitor class for real-time event flow visualization and metrics collection. Implement event replay coordinator that can replay events from specific time ranges or event IDs. Add replay speed control (real-time, accelerated, or step-by-step). Create event filtering capabilities for replay (by type, symbol, or custom predicates). Implement event audit trail with full event history. Add Prometheus metrics export for event processing statistics.
+

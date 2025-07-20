@@ -1,0 +1,1001 @@
+{
+  "master": {
+    "tasks": [
+      {
+        "id": 1,
+        "title": "Setup Project Repository",
+        "description": "Initialize the project repository with a clear structure for the trading system.",
+        "details": "Create a Git repository with the following structure: /src for source code, /tests for test cases, /docs for documentation, and /configs for configuration files. Include a README.md file with project overview and setup instructions.",
+        "testStrategy": "Verify repository structure and ensure README.md contains correct setup instructions.",
+        "priority": "medium",
+        "dependencies": [],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Initialize Git Repository and Base Structure",
+            "description": "Create a new Git repository and establish the foundational directory structure for the Silvertine trading system",
+            "dependencies": [],
+            "details": "Initialize a new Git repository using 'git init'. Create the base directory structure: /src for Python source code, /tests for pytest test cases, /docs for technical documentation, and /config for configuration files (note: renamed from /configs to match CLAUDE.md specification). Add a .gitignore file with Python-specific exclusions including __pycache__, *.pyc, .env, venv/, and cache/ directory. Create empty __init__.py files in src/ and tests/ directories to establish Python package structure.",
+            "status": "done",
+            "testStrategy": "Verify Git repository initialization with 'git status'. Check directory structure exists with proper permissions. Validate .gitignore contains all necessary Python and project-specific exclusions. Ensure Python package structure is valid by attempting to import from src directory."
+          },
+          {
+            "id": 2,
+            "title": "Create Comprehensive README.md with Project Overview",
+            "description": "Write a detailed README.md file that serves as the primary entry point for developers working with the Silvertine trading system",
+            "dependencies": [
+              "1.1"
+            ],
+            "details": "Create README.md in the repository root with the following sections: Project name and description emphasizing event-driven architecture and quantitative trading focus. Features section highlighting asyncio event bus, multi-exchange support (Binance testnet, Interactive Brokers), real-time TUI interface, and paper trading capabilities. Technology stack overview including Python 3.11+, Redis Streams, SQLite, Textual framework, and FastAPI. Quick start guide with installation steps, environment setup, and basic usage examples. Project structure explanation mapping to the created directories. Development workflow section referencing TaskMaster integration. Links to further documentation in /docs directory.",
+            "status": "done",
+            "testStrategy": "Validate README.md contains all required sections using markdown linting tools. Check that all commands in quick start guide are executable. Verify links to documentation are not broken. Test that setup instructions can be followed by a new developer to get the project running."
+          },
+          {
+            "id": 3,
+            "title": "Setup Python Project Configuration and Dependencies",
+            "description": "Establish Python project configuration with dependency management and development environment setup",
+            "dependencies": [
+              "1.1"
+            ],
+            "details": "Create pyproject.toml file for modern Python project configuration with project metadata including name='silvertine', version='0.1.0', and Python requirement >=3.11. Define core dependencies: asyncio, redis, sqlalchemy, textual, fastapi, websockets, pydantic. Add development dependencies: pytest, pytest-asyncio, pytest-cov, black, mypy, ruff. Create requirements.txt and requirements-dev.txt for pip compatibility. Add setup.py for backwards compatibility if needed. Create .python-version file specifying 3.11 for pyenv users. Initialize virtual environment setup instructions.",
+            "status": "done",
+            "testStrategy": "Verify pyproject.toml is valid TOML syntax. Test dependency installation in a fresh virtual environment. Validate that all specified packages can be installed without conflicts. Check Python version compatibility by running code with Python 3.11+."
+          },
+          {
+            "id": 4,
+            "title": "Configure Development Tools and Git Hooks",
+            "description": "Set up development tooling for code quality, formatting, and automated checks",
+            "dependencies": [
+              "1.3"
+            ],
+            "details": "Create .pre-commit-config.yaml for pre-commit hooks including black for code formatting, ruff for linting, mypy for type checking, and conventional commit message validation. Add pytest configuration in pyproject.toml with test paths, coverage targets (75% as specified), and asyncio settings. Create .editorconfig for consistent code formatting across different editors. Setup GitHub Actions workflow template in .github/workflows/ci.yml for continuous integration. Add Makefile with common development commands: make test, make lint, make format, make install. Configure VS Code settings in .vscode/settings.json for Python development.",
+            "status": "done",
+            "testStrategy": "Install pre-commit hooks and verify they run on test commits. Execute all Makefile commands to ensure they work correctly. Validate GitHub Actions workflow syntax. Test that code formatting and linting tools are properly configured by introducing deliberate style violations and checking detection."
+          },
+          {
+            "id": 5,
+            "title": "Initialize Configuration and Documentation Templates",
+            "description": "Create initial configuration structure and documentation templates aligned with project requirements",
+            "dependencies": [
+              "1.1",
+              "1.2"
+            ],
+            "details": "Create /config directory structure with subdirectories: environments/, exchanges/, strategies/, risk/, logging/, database/, security/, monitoring/. Add example configuration files: config/environments/development.yaml.example, config/exchanges/binance_testnet.yaml.example with rate limit settings placeholders, config/exchanges/interactive_brokers.yaml.example with connection parameters. Create /docs directory with initial documentation structure: architecture.md for system design, api.md for API documentation template, deployment.md for deployment guide template, development.md for development workflow. Add .env.example file in root with all required environment variables documented but not populated. Ensure cache/ directory is created but empty, with proper .gitignore entry.",
+            "status": "done",
+            "testStrategy": "Verify all configuration directories exist with correct structure. Check that all .example files contain valid YAML/env syntax with helpful comments. Validate that sensitive files are properly excluded from git tracking. Test that configuration templates can be copied and used as starting points for actual configuration."
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "title": "Implement Event-Driven Core Engine",
+        "description": "Develop the core event-driven engine using asyncio and Redis Streams.",
+        "details": "Utilize Python's asyncio library to create an event loop. Implement Redis Streams for event persistence and replay. Define four core event types: MarketDataEvent, OrderEvent, FillEvent, SignalEvent. Ensure events are processed in order and are idempotent.",
+        "testStrategy": "Create unit tests for event handling and integration tests to verify event persistence and replay functionality.",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Design Event System Architecture and Base Classes",
+            "description": "Create the foundational event system architecture with abstract base classes and interfaces for the four core event types (MarketDataEvent, OrderEvent, FillEvent, SignalEvent) using Python's asyncio library.",
+            "dependencies": [],
+            "details": "Define abstract base Event class with common attributes (event_id, timestamp, event_type). Create concrete event classes for MarketDataEvent (symbol, price, volume, bid/ask), OrderEvent (order_id, symbol, direction, quantity, order_type), FillEvent (order_id, symbol, executed_qty, executed_price, commission), and SignalEvent (symbol, signal_type, strength, strategy_id). Implement event serialization/deserialization methods for Redis persistence. Use dataclasses or Pydantic models for type safety and validation.",
+            "status": "pending",
+            "testStrategy": "Write unit tests for each event class verifying proper instantiation, validation of required fields, serialization to/from Redis format, and immutability of event objects. Test edge cases like missing fields, invalid data types, and extreme values."
+          },
+          {
+            "id": 2,
+            "title": "Implement Redis Streams Integration Layer",
+            "description": "Develop the Redis Streams integration layer for event persistence, including connection management, stream creation, and event publishing/consuming mechanisms.",
+            "dependencies": [
+              "2.1"
+            ],
+            "details": "Create RedisStreamManager class to handle Redis connection pooling using aioredis. Implement methods for creating streams (one per event type), publishing events with XADD command, consuming events with XREAD/XREADGROUP, and managing consumer groups. Add connection retry logic with exponential backoff. Implement event replay functionality using XRANGE for historical event retrieval. Configure Redis persistence settings (AOF/RDB) for durability.",
+            "status": "pending",
+            "testStrategy": "Create integration tests using a test Redis instance or redis-py-fakeredis. Test connection establishment and reconnection scenarios, event publishing to correct streams, consumer group creation and message acknowledgment, event replay from specific timestamps, and handling of Redis connection failures."
+          },
+          {
+            "id": 3,
+            "title": "Build Asyncio Event Bus Core",
+            "description": "Implement the central asyncio-based event bus that coordinates event flow between components, ensuring ordered processing and idempotent event handling.",
+            "dependencies": [
+              "2.1",
+              "2.2"
+            ],
+            "details": "Create EventBus class using asyncio.Queue for in-memory event buffering. Implement publish() and subscribe() methods with topic-based routing. Add event handler registration with priority support. Ensure FIFO ordering within each event type using separate queues. Implement idempotency by tracking processed event IDs in a time-windowed cache. Add circuit breaker pattern for failing handlers. Create event processing metrics (throughput, latency, error rates).",
+            "status": "pending",
+            "testStrategy": "Write comprehensive unit tests for event routing, handler execution order, and concurrent event processing. Test idempotency by publishing duplicate events and verifying single processing. Verify FIFO ordering under high concurrency. Test circuit breaker activation on handler failures."
+          },
+          {
+            "id": 4,
+            "title": "Develop Event Processing Pipeline",
+            "description": "Create the event processing pipeline that consumes events from Redis Streams and routes them through the asyncio event bus to registered handlers.",
+            "dependencies": [
+              "2.2",
+              "2.3"
+            ],
+            "details": "Implement EventProcessor class that bridges Redis Streams and the asyncio event bus. Create separate asyncio tasks for each event stream consumer. Implement backpressure handling to prevent memory overflow. Add event transformation and validation before routing. Implement dead letter queue for failed events. Create event processing checkpoints for recovery. Add graceful shutdown handling with in-flight event completion.",
+            "status": "pending",
+            "testStrategy": "Create end-to-end integration tests simulating full event flow from Redis to handlers. Test backpressure by generating high event volumes and monitoring memory usage. Verify checkpoint recovery by simulating crashes and restarts. Test graceful shutdown with pending events."
+          },
+          {
+            "id": 5,
+            "title": "Implement Event Monitoring and Replay System",
+            "description": "Build comprehensive event monitoring, debugging tools, and replay functionality for historical event processing and system recovery.",
+            "dependencies": [
+              "2.3",
+              "2.4"
+            ],
+            "details": "Create EventMonitor class for real-time event flow visualization and metrics collection. Implement event replay coordinator that can replay events from specific time ranges or event IDs. Add replay speed control (real-time, accelerated, or step-by-step). Create event filtering capabilities for replay (by type, symbol, or custom predicates). Implement event audit trail with full event history. Add Prometheus metrics export for event processing statistics.",
+            "status": "pending",
+            "testStrategy": "Test replay functionality by recording live event sequences and replaying them, verifying identical system state. Test monitoring accuracy by comparing reported metrics with actual event counts. Verify replay filtering works correctly with various predicates. Test performance impact of monitoring on event processing throughput."
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "title": "Create Modular Broker Interface",
+        "description": "Develop an abstract broker interface to support multiple brokers.",
+        "details": "Define an AbstractBroker class with standard methods for order management, position queries, and balance management. Implement adapters for Binance and Interactive Brokers. Include a paper trading simulator that mimics real trading behavior.",
+        "testStrategy": "Test the broker interface with mock data to ensure correct order execution and position management.",
+        "priority": "high",
+        "dependencies": [
+          2
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Design AbstractBroker Base Class",
+            "description": "Create the abstract base class defining the standard broker interface with all required methods and properties",
+            "dependencies": [],
+            "details": "Define AbstractBroker as an abstract base class with abstract methods for order placement (place_order, cancel_order, modify_order), position management (get_positions, get_position), account queries (get_balance, get_account_info), market data (get_quote, get_orderbook), and connection management (connect, disconnect, is_connected). Include proper type hints, docstrings, and error handling specifications. Define standard data classes for Order, Position, Balance, and AccountInfo.",
+            "status": "pending",
+            "testStrategy": "Create unit tests for the abstract interface validation, ensuring all required methods are defined and properly typed. Test that concrete implementations must override all abstract methods."
+          },
+          {
+            "id": 2,
+            "title": "Implement Paper Trading Simulator",
+            "description": "Develop a paper trading broker implementation that simulates realistic trading behavior with configurable parameters",
+            "dependencies": [
+              "3.1"
+            ],
+            "details": "Create PaperTradingBroker class inheriting from AbstractBroker. Implement simulated order execution with configurable slippage models (fixed, percentage, market impact), realistic fill simulation based on order book depth, position tracking with P&L calculation, balance management with margin requirements, and order state management (pending, filled, cancelled, rejected). Include configurable latency simulation and partial fill support. Store execution history for analysis.",
+            "status": "pending",
+            "testStrategy": "Test order execution with various market conditions, verify slippage calculations, test position tracking accuracy, validate balance updates after trades, test edge cases like insufficient funds and margin calls."
+          },
+          {
+            "id": 3,
+            "title": "Create Binance Exchange Adapter",
+            "description": "Implement the Binance broker adapter supporting both testnet and production environments",
+            "dependencies": [
+              "3.1"
+            ],
+            "details": "Develop BinanceBroker class implementing AbstractBroker interface. Integrate with Binance REST API for order management and account queries, WebSocket streams for real-time updates, and handle API rate limiting with automatic throttling. Implement order type mapping (market, limit, stop-loss, take-profit), position calculation from balance changes, error handling with automatic retry logic, and support for both spot and futures trading. Include testnet/production environment switching.",
+            "status": "pending",
+            "testStrategy": "Test against Binance testnet API, verify order placement and cancellation, test WebSocket reconnection logic, validate rate limiting compliance, test error handling for network issues and API errors."
+          },
+          {
+            "id": 4,
+            "title": "Develop Interactive Brokers Adapter",
+            "description": "Create the Interactive Brokers adapter with support for multiple asset classes and paper trading",
+            "dependencies": [
+              "3.1"
+            ],
+            "details": "Implement InteractiveBrokersBroker class using ib_insync library. Handle IB Gateway/TWS connection management with automatic reconnection, implement order routing for stocks, futures, and forex, manage IB's asynchronous API with proper event handling, track positions across multiple accounts, handle market data subscriptions and throttling. Include contract search and validation, commission tracking, and support for complex order types (bracket, trailing stop).",
+            "status": "pending",
+            "testStrategy": "Test with IB paper trading account, verify connection stability over extended periods, test order execution across different asset classes, validate position synchronization, test handling of API disconnections and errors."
+          },
+          {
+            "id": 5,
+            "title": "Build Broker Factory and Configuration System",
+            "description": "Create a factory pattern for broker instantiation with comprehensive configuration management",
+            "dependencies": [
+              "3.2",
+              "3.3",
+              "3.4"
+            ],
+            "details": "Implement BrokerFactory class with dynamic broker selection based on configuration. Create YAML-based configuration system for broker settings, credentials management with environment variable support, connection parameters, and trading rules. Include broker health monitoring with automatic failover, performance metrics collection (latency, success rate), and unified error handling across all broker implementations. Add broker-specific configuration validation and testing utilities.",
+            "status": "pending",
+            "testStrategy": "Test factory instantiation of all broker types, verify configuration loading and validation, test failover mechanisms, validate metrics collection, test configuration templates and environment variable substitution."
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "title": "Build Multi-Source Data Aggregation System",
+        "description": "Implement a data aggregation system that supports multiple data sources.",
+        "details": "Create an AbstractDataSource class to handle both historical and real-time data. Implement caching mechanisms to reduce API calls by over 80%. Ensure data quality checks are in place to handle missing and anomalous values.",
+        "testStrategy": "Conduct integration tests to verify data aggregation from multiple sources and validate data quality checks.",
+        "priority": "high",
+        "dependencies": [
+          2
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Design AbstractDataSource Interface",
+            "description": "Create the abstract base class and interface for all data sources with standardized methods for both historical and real-time data retrieval",
+            "dependencies": [],
+            "details": "Define abstract methods for connect(), disconnect(), get_historical_data(), subscribe_realtime(), validate_data(), and handle_errors(). Include data transformation interfaces to normalize data from different sources into a common format. Design the interface to support async operations and proper error handling.",
+            "status": "pending",
+            "testStrategy": "Create mock implementations of the abstract class and verify all required methods are properly defined. Test that concrete implementations must override all abstract methods."
+          },
+          {
+            "id": 2,
+            "title": "Implement Redis-Based Caching Layer",
+            "description": "Build a comprehensive caching mechanism using Redis to store and retrieve market data efficiently, reducing API calls by over 80%",
+            "dependencies": [
+              "4.1"
+            ],
+            "details": "Implement cache key generation strategies based on symbol, timeframe, and data type. Design TTL policies for different data types (real-time vs historical). Create cache warming strategies for frequently accessed data. Implement cache invalidation logic for stale data. Add metrics to track cache hit/miss ratios and API call reduction.",
+            "status": "pending",
+            "testStrategy": "Test cache operations with simulated data, verify TTL expiration, measure cache hit rates, and validate that API calls are reduced by at least 80% in typical usage scenarios."
+          },
+          {
+            "id": 3,
+            "title": "Create Data Quality Validation System",
+            "description": "Develop comprehensive data quality checks to identify and handle missing values, outliers, and anomalous data points",
+            "dependencies": [
+              "4.1"
+            ],
+            "details": "Implement validation rules for price data (non-negative, within reasonable bounds), volume data (non-negative integers), and timestamp consistency. Create anomaly detection using statistical methods (z-score, IQR) for price movements. Design handling strategies for missing data (forward fill, interpolation, or rejection). Add data quality metrics and logging for monitoring data integrity.",
+            "status": "pending",
+            "testStrategy": "Test with datasets containing known anomalies, missing values, and outliers. Verify that each type of data quality issue is correctly identified and handled according to configured strategies."
+          },
+          {
+            "id": 4,
+            "title": "Build Multi-Source Aggregation Engine",
+            "description": "Create the core aggregation engine that combines data from multiple sources, handles conflicts, and maintains data consistency",
+            "dependencies": [
+              "4.1",
+              "4.2",
+              "4.3"
+            ],
+            "details": "Implement priority-based source selection for conflicting data. Design data fusion algorithms for combining overlapping datasets. Create timestamp alignment mechanisms for sources with different update frequencies. Build connection pooling and failover logic for source reliability. Implement aggregation strategies (latest value, weighted average, consensus) based on data type.",
+            "status": "pending",
+            "testStrategy": "Integration test with multiple mock data sources providing overlapping and conflicting data. Verify correct aggregation, priority handling, and failover behavior when sources become unavailable."
+          },
+          {
+            "id": 5,
+            "title": "Implement Concrete Data Source Adapters",
+            "description": "Create concrete implementations of AbstractDataSource for Binance and Interactive Brokers with proper rate limiting and error handling",
+            "dependencies": [
+              "4.4"
+            ],
+            "details": "Build BinanceDataSource with WebSocket support for real-time data and REST API for historical data. Implement IBDataSource using ib_insync for Interactive Brokers integration. Add rate limiting logic respecting exchange-specific limits. Include reconnection logic with exponential backoff. Implement data normalization to convert exchange-specific formats to common internal format.",
+            "status": "pending",
+            "testStrategy": "Test each adapter against testnet/paper trading APIs. Verify rate limiting compliance, reconnection behavior, and correct data transformation. Use mock servers to test error scenarios and edge cases."
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "title": "Develop Strategy Development Framework",
+        "description": "Create a standardized framework for strategy development.",
+        "details": "Implement the AbstractStrategy class that provides an interface for strategy logic. Include support for Bar-based and Tick-based strategies. Provide built-in performance metrics for strategy evaluation.",
+        "testStrategy": "Create example strategies and validate their performance metrics against known benchmarks.",
+        "priority": "medium",
+        "dependencies": [
+          3
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Design and Implement AbstractStrategy Base Class",
+            "description": "Create the core AbstractStrategy base class that defines the interface and common functionality for all trading strategies",
+            "dependencies": [],
+            "details": "Design the AbstractStrategy class with abstract methods for on_bar(), on_tick(), on_signal(), on_fill(), and calculate_signals(). Include common properties like name, symbols, timeframe, and position tracking. Implement base functionality for logging, error handling, and strategy lifecycle management (initialize, start, stop, reset). Define standardized interfaces for accessing market data, account information, and placing orders through the broker interface.",
+            "status": "pending",
+            "testStrategy": "Create unit tests to verify the AbstractStrategy interface contract, test inheritance mechanisms with mock strategies, validate error handling and lifecycle methods, and ensure proper integration points with the event system"
+          },
+          {
+            "id": 2,
+            "title": "Implement Bar-based Strategy Support",
+            "description": "Develop specialized support for strategies that operate on completed price bars (candlesticks) with various timeframes",
+            "dependencies": [
+              "5.1"
+            ],
+            "details": "Create BarStrategy class inheriting from AbstractStrategy with specialized on_bar() implementation. Support multiple timeframes (1m, 5m, 15m, 1h, 4h, 1d) with automatic bar aggregation from tick data. Implement bar series management with configurable lookback periods and rolling window calculations. Add technical indicator integration points for common indicators (SMA, EMA, RSI, MACD, Bollinger Bands). Include bar-specific utilities like pattern recognition helpers and price action analysis tools.",
+            "status": "pending",
+            "testStrategy": "Test bar aggregation accuracy across different timeframes, validate technical indicator calculations against known values, verify memory efficiency with large lookback periods, and test edge cases like missing bars and weekend gaps"
+          },
+          {
+            "id": 3,
+            "title": "Implement Tick-based Strategy Support",
+            "description": "Develop specialized support for high-frequency strategies that react to individual price ticks and order book changes",
+            "dependencies": [
+              "5.1"
+            ],
+            "details": "Create TickStrategy class inheriting from AbstractStrategy with specialized on_tick() implementation. Support level 2 market data processing including bid/ask spreads and order book depth. Implement tick buffering and aggregation for micro-structure analysis. Add latency-sensitive features like tick-by-tick position tracking and immediate order placement. Include utilities for spread analysis, volume profile tracking, and market microstructure metrics.",
+            "status": "pending",
+            "testStrategy": "Test tick processing performance under high-frequency data streams, validate order book reconstruction accuracy, measure latency from tick arrival to signal generation, and stress test with rapid price movements"
+          },
+          {
+            "id": 4,
+            "title": "Build Strategy Performance Metrics System",
+            "description": "Create a comprehensive performance measurement and reporting system for strategy evaluation",
+            "dependencies": [
+              "5.1"
+            ],
+            "details": "Implement StrategyMetrics class to calculate real-time and historical performance metrics including returns (total, annualized, risk-adjusted), Sharpe ratio, Sortino ratio, maximum drawdown, win rate, profit factor, and average trade duration. Add trade-level analytics tracking entry/exit prices, holding periods, and P&L attribution. Create metric aggregation for multi-asset strategies with correlation analysis. Implement performance attribution to identify profit sources (market timing, asset selection, position sizing).",
+            "status": "pending",
+            "testStrategy": "Validate metric calculations against industry-standard formulas, test with synthetic trade data covering various market conditions, verify accuracy of drawdown calculations during volatile periods, and compare results with external portfolio analytics tools"
+          },
+          {
+            "id": 5,
+            "title": "Create Example Strategies and Strategy Templates",
+            "description": "Develop reference implementations demonstrating framework usage and serving as templates for custom strategies",
+            "dependencies": [
+              "5.2",
+              "5.3",
+              "5.4"
+            ],
+            "details": "Implement MovingAverageCrossover strategy as a simple bar-based example with configurable fast/slow periods. Create MeanReversionStrategy using Bollinger Bands for range-bound markets. Develop a TickScalpingStrategy demonstrating high-frequency tick processing. Build a MultiAssetMomentum strategy showing portfolio-level position management. Include comprehensive documentation, parameter optimization examples, and backtesting configurations for each strategy.",
+            "status": "pending",
+            "testStrategy": "Backtest each example strategy on 2 years of historical data, verify they achieve positive returns in appropriate market conditions, validate against published academic results where applicable, and ensure code serves as clear educational examples"
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "title": "Implement High-Precision Backtesting Engine",
+        "description": "Develop a backtesting engine to simulate historical trading scenarios.",
+        "details": "Ensure the backtesting engine shares the same strategy code and risk management modules as live trading. Implement cost simulation for fees, slippage, and market impact. Generate detailed performance reports with over 15 metrics.",
+        "testStrategy": "Run backtests on historical data and compare results with expected outcomes to validate accuracy.",
+        "priority": "high",
+        "dependencies": [
+          4,
+          5
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Integrate Strategy Code",
+            "description": "Ensure the backtesting engine uses the same strategy code as the live trading system.",
+            "dependencies": [],
+            "details": "Review and integrate the existing strategy codebase into the backtesting engine to maintain consistency with live trading.",
+            "status": "pending",
+            "testStrategy": "Run unit tests on the strategy code to ensure it functions correctly within the backtesting context."
+          },
+          {
+            "id": 2,
+            "title": "Implement Risk Management Modules",
+            "description": "Incorporate the same risk management modules used in live trading into the backtesting engine.",
+            "dependencies": [],
+            "details": "Adapt the existing risk management modules to work seamlessly with the backtesting engine, ensuring accurate risk assessments.",
+            "status": "pending",
+            "testStrategy": "Conduct backtests to validate that risk management rules are applied correctly during simulations."
+          },
+          {
+            "id": 3,
+            "title": "Cost Simulation Implementation",
+            "description": "Develop cost simulation features for fees, slippage, and market impact.",
+            "dependencies": [],
+            "details": "Create algorithms to simulate trading costs accurately, reflecting real market conditions during backtests.",
+            "status": "pending",
+            "testStrategy": "Compare backtest results with and without cost simulations to assess their impact on performance metrics."
+          },
+          {
+            "id": 4,
+            "title": "Performance Report Generation",
+            "description": "Generate detailed performance reports with over 15 metrics.",
+            "dependencies": [],
+            "details": "Design a reporting module that compiles performance data from backtests and presents it in a user-friendly format.",
+            "status": "pending",
+            "testStrategy": "Validate the accuracy of the performance metrics against known benchmarks and expected outcomes."
+          },
+          {
+            "id": 5,
+            "title": "Backtest Validation",
+            "description": "Run backtests on historical data and compare results with expected outcomes.",
+            "dependencies": [],
+            "details": "Establish a validation process to ensure the backtesting engine produces accurate and reliable results.",
+            "status": "pending",
+            "testStrategy": "Create a suite of tests that compare backtest results against historical performance data to ensure accuracy."
+          }
+        ]
+      },
+      {
+        "id": 8,
+        "title": "Create Risk Management System",
+        "description": "Implement a system for real-time risk monitoring and control.",
+        "details": "Develop features for position limits, stop-loss, take-profit, and maximum drawdown controls. Include real-time risk metrics and an emergency stop mechanism. Log risk events and alerts for monitoring.",
+        "testStrategy": "Simulate various trading scenarios to test the effectiveness of risk controls and ensure alerts are triggered appropriately.",
+        "priority": "high",
+        "dependencies": [
+          6
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Define Position Limits Feature",
+            "description": "Develop the functionality to set and enforce position limits for trading.",
+            "dependencies": [],
+            "details": "Implement logic to define maximum position sizes based on risk appetite and account balance.",
+            "status": "pending",
+            "testStrategy": "Simulate trading scenarios to ensure position limits are enforced correctly."
+          },
+          {
+            "id": 2,
+            "title": "Implement Stop-Loss Mechanism",
+            "description": "Create a stop-loss feature to automatically close positions at predefined loss levels.",
+            "dependencies": [],
+            "details": "Develop the algorithm to trigger stop-loss orders based on market conditions and user settings.",
+            "status": "pending",
+            "testStrategy": "Test the stop-loss functionality under various market conditions to verify execution."
+          },
+          {
+            "id": 3,
+            "title": "Develop Take-Profit Functionality",
+            "description": "Implement a take-profit feature to secure profits at specified price levels.",
+            "dependencies": [],
+            "details": "Create logic to automatically close positions when target profit levels are reached.",
+            "status": "pending",
+            "testStrategy": "Simulate trades to ensure take-profit orders are executed as intended."
+          },
+          {
+            "id": 4,
+            "title": "Establish Maximum Drawdown Controls",
+            "description": "Create a system to monitor and limit maximum drawdown levels.",
+            "dependencies": [],
+            "details": "Implement tracking of account equity and trigger alerts or actions when drawdown thresholds are breached.",
+            "status": "pending",
+            "testStrategy": "Run scenarios to validate drawdown monitoring and response mechanisms."
+          },
+          {
+            "id": 5,
+            "title": "Log Risk Events and Alerts",
+            "description": "Develop a logging system for risk events and alerts for monitoring purposes.",
+            "dependencies": [],
+            "details": "Implement a logging mechanism to capture and store risk-related events and alerts for analysis.",
+            "status": "pending",
+            "testStrategy": "Verify that all risk events are logged accurately and can be retrieved for review."
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "title": "Develop TUI Interface with Rich Library",
+        "description": "Create a sophisticated terminal-based trading dashboard using the Rich library.",
+        "status": "pending",
+        "dependencies": [
+          6
+        ],
+        "priority": "medium",
+        "details": "Develop a TUI interface that utilizes Rich's advanced text rendering capabilities. The dashboard will feature live tables for market data and positions, progress bars for system status, keyboard shortcuts for trading operations, and real-time updates. Remove all references to the web interface as that is now handled by separate Task 15.",
+        "testStrategy": "Conduct user testing to gather feedback on the usability and responsiveness of the TUI interface.",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Set Up Rich Library Environment",
+            "description": "Install and configure the Rich library in the development environment.",
+            "dependencies": [],
+            "details": "Ensure that all necessary dependencies for the Rich library are installed and properly configured for use in the TUI interface.",
+            "status": "pending",
+            "testStrategy": "Verify the installation by running a sample Rich application."
+          },
+          {
+            "id": 2,
+            "title": "Design Dashboard Layout",
+            "description": "Create a wireframe for the terminal-based trading dashboard layout.",
+            "dependencies": [
+              "7.1"
+            ],
+            "details": "Outline the placement of live tables, progress bars, and keyboard shortcuts in the dashboard interface.",
+            "status": "pending",
+            "testStrategy": "Review the wireframe with stakeholders for feedback."
+          },
+          {
+            "id": 3,
+            "title": "Implement Live Market Data Tables",
+            "description": "Develop the functionality to display live market data in tables using Rich.",
+            "dependencies": [
+              "7.2"
+            ],
+            "details": "Utilize Rich's table features to create a dynamic display of market data that updates in real-time.",
+            "status": "pending",
+            "testStrategy": "Conduct user testing to ensure data is displayed correctly and updates as expected."
+          },
+          {
+            "id": 4,
+            "title": "Add Progress Bars for System Status",
+            "description": "Integrate progress bars to indicate system status and ongoing operations.",
+            "dependencies": [
+              "7.3"
+            ],
+            "details": "Use Rich's progress bar capabilities to visually represent the status of various trading operations.",
+            "status": "pending",
+            "testStrategy": "Test the progress bars under different operational scenarios to ensure accuracy."
+          },
+          {
+            "id": 5,
+            "title": "Implement Keyboard Shortcuts for Trading Operations",
+            "description": "Create keyboard shortcuts for executing trading operations within the TUI.",
+            "dependencies": [
+              "7.4"
+            ],
+            "details": "Define and implement keyboard shortcuts that allow users to perform trading actions quickly and efficiently.",
+            "status": "pending",
+            "testStrategy": "Conduct usability testing to ensure that keyboard shortcuts are intuitive and functional."
+          }
+        ]
+      },
+      {
+        "id": 9,
+        "title": "Implement RESTful API Design",
+        "description": "Create a RESTful API for system control and strategy management.",
+        "details": "Define API endpoints for system control, strategy management, trading queries, backtesting, and risk management. Ensure proper authentication and rate limiting for API access.",
+        "testStrategy": "Perform API integration tests to verify endpoint functionality and security measures.",
+        "priority": "high",
+        "dependencies": [
+          8
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Define API Endpoints",
+            "description": "Outline and document the API endpoints for system control, strategy management, trading queries, backtesting, and risk management.",
+            "dependencies": [],
+            "details": "Create a detailed specification for each endpoint including HTTP methods, request parameters, and response formats.",
+            "status": "pending",
+            "testStrategy": "Review endpoint specifications with the development team for completeness and accuracy."
+          },
+          {
+            "id": 2,
+            "title": "Implement Authentication Mechanism",
+            "description": "Develop a secure authentication system for the API using JWT.",
+            "dependencies": [],
+            "details": "Utilize the PyJWT library to implement JWT-based authentication for all API endpoints.",
+            "status": "pending",
+            "testStrategy": "Create tests to verify token generation, expiration, and validation processes."
+          },
+          {
+            "id": 3,
+            "title": "Set Up Rate Limiting",
+            "description": "Implement rate limiting for API access to prevent abuse and ensure fair usage.",
+            "dependencies": [],
+            "details": "Use a middleware solution to enforce rate limits based on user roles and API usage patterns.",
+            "status": "pending",
+            "testStrategy": "Conduct load testing to ensure rate limiting works as expected under high traffic."
+          },
+          {
+            "id": 4,
+            "title": "Develop API Documentation",
+            "description": "Create comprehensive documentation for the API to assist developers in integration.",
+            "dependencies": [],
+            "details": "Use tools like Swagger or Postman to generate and maintain API documentation.",
+            "status": "pending",
+            "testStrategy": "Review documentation with potential users to ensure clarity and completeness."
+          },
+          {
+            "id": 5,
+            "title": "Conduct API Integration Testing",
+            "description": "Perform integration tests to verify the functionality and security of the API endpoints.",
+            "dependencies": [],
+            "details": "Create a suite of integration tests that cover all endpoints and their security measures.",
+            "status": "pending",
+            "testStrategy": "Run tests in a staging environment and validate against expected outcomes."
+          }
+        ]
+      },
+      {
+        "id": 10,
+        "title": "Conduct Performance Testing and Optimization",
+        "description": "Test the system for performance and optimize as necessary.",
+        "details": "Measure system performance against defined metrics such as event processing latency and memory usage. Optimize code and architecture based on findings to ensure scalability and reliability.",
+        "testStrategy": "Run performance benchmarks and stress tests to identify bottlenecks and validate improvements.",
+        "priority": "medium",
+        "dependencies": [
+          9
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Define Performance Metrics",
+            "description": "Identify and document the key performance metrics to be measured during testing.",
+            "dependencies": [],
+            "details": "Metrics include event processing latency, memory usage, and throughput.",
+            "status": "pending",
+            "testStrategy": "Review and validate the defined metrics with stakeholders."
+          },
+          {
+            "id": 2,
+            "title": "Conduct Initial Performance Benchmarking",
+            "description": "Run initial performance benchmarks to establish baseline performance metrics.",
+            "dependencies": [
+              "10.1"
+            ],
+            "details": "Use automated tools to measure system performance against the defined metrics.",
+            "status": "pending",
+            "testStrategy": "Generate a report comparing baseline metrics to expected performance."
+          },
+          {
+            "id": 3,
+            "title": "Identify Performance Bottlenecks",
+            "description": "Analyze benchmarking results to identify any performance bottlenecks in the system.",
+            "dependencies": [
+              "10.2"
+            ],
+            "details": "Focus on areas such as code execution time, memory leaks, and inefficient algorithms.",
+            "status": "pending",
+            "testStrategy": "Document findings and prioritize bottlenecks for optimization."
+          },
+          {
+            "id": 4,
+            "title": "Optimize Code and Architecture",
+            "description": "Implement optimizations in the code and system architecture based on identified bottlenecks.",
+            "dependencies": [
+              "10.3"
+            ],
+            "details": "Refactor code, improve algorithms, and enhance system architecture for scalability.",
+            "status": "pending",
+            "testStrategy": "Re-run performance benchmarks to validate improvements."
+          },
+          {
+            "id": 5,
+            "title": "Finalize Performance Testing Report",
+            "description": "Compile a comprehensive report detailing performance testing results and optimizations made.",
+            "dependencies": [
+              "10.4"
+            ],
+            "details": "Include metrics before and after optimization, along with recommendations for future improvements.",
+            "status": "pending",
+            "testStrategy": "Present the report to stakeholders for review and feedback."
+          }
+        ]
+      },
+      {
+        "id": 11,
+        "title": "Establish Comprehensive Testing Infrastructure",
+        "description": "Build a complete testing framework implementing TDD methodology with unit, integration, stability, and performance testing capabilities targeting 75% code coverage.",
+        "details": "Set up pytest as the primary testing framework with pytest-asyncio for async code testing. Configure pytest-cov for coverage reporting with HTML and terminal output formats. Implement test structure following src/tests/{unit,integration,stability,performance} organization. Create base test fixtures for event bus, mock brokers, and simulated market data. Establish continuous integration with GitHub Actions running tests on every commit. Implement test data factories using factory_boy for consistent test object creation. Configure tox for testing across multiple Python versions (3.11, 3.12). Set up pytest-benchmark for performance testing with configurable thresholds. Create stability test harness using pytest-timeout and memory_profiler for 8-24 hour runtime validation. Implement integration test containers using testcontainers-python for database and message queue testing. Configure hypothesis for property-based testing of critical components. Establish mocking strategy using unittest.mock and pytest-mock for external dependencies. Create custom pytest plugins for trading-specific assertions and test utilities. Set up parallel test execution with pytest-xdist for faster feedback. Implement test categorization with pytest markers (@pytest.mark.unit, @pytest.mark.integration, @pytest.mark.slow). Configure pre-commit hooks running pytest and coverage checks. Establish performance baselines for event processing (<100ms) and order execution (<500ms). Create automated test report generation with allure-pytest for detailed test analytics.",
+        "testStrategy": "Verify pytest installation and configuration by running 'pytest --version'. Create sample unit tests for core components (Event, EventBus, AbstractStrategy) achieving >75% coverage. Run integration tests against test doubles of Binance and IB interfaces. Execute 8-hour stability test monitoring memory usage stays below 1GB. Benchmark event processing achieving <100ms latency for 1000 events/second. Validate coverage reporting shows line, branch, and function coverage metrics. Test CI pipeline triggers on git push and blocks merge on test failure. Verify performance tests fail when thresholds are exceeded. Confirm test isolation with no shared state between test runs. Validate parallel execution reduces test suite runtime by >50%. Test that pre-commit hooks prevent commits with <75% coverage. Verify all test categories can be run independently with markers. Confirm test reports generate actionable insights for failed tests.",
+        "status": "pending",
+        "dependencies": [
+          2,
+          3,
+          4,
+          5
+        ],
+        "priority": "medium",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Set Up Pytest Framework",
+            "description": "Install and configure pytest as the primary testing framework, including pytest-asyncio for async code testing.",
+            "dependencies": [],
+            "details": "Ensure pytest is installed and configured correctly by running 'pytest --version'.",
+            "status": "pending",
+            "testStrategy": "Verify installation by executing a simple test case."
+          },
+          {
+            "id": 2,
+            "title": "Configure Coverage Reporting",
+            "description": "Set up pytest-cov for coverage reporting with both HTML and terminal output formats.",
+            "dependencies": [
+              "11.1"
+            ],
+            "details": "Integrate pytest-cov into the testing framework to track code coverage and generate reports.",
+            "status": "pending",
+            "testStrategy": "Run tests and verify that coverage reports are generated correctly."
+          },
+          {
+            "id": 3,
+            "title": "Implement Test Structure",
+            "description": "Organize tests into the directory structure src/tests/{unit,integration,stability,performance}.",
+            "dependencies": [
+              "11.2"
+            ],
+            "details": "Create the necessary directories and ensure that tests are categorized appropriately.",
+            "status": "pending",
+            "testStrategy": "Run tests from each category to confirm proper organization."
+          },
+          {
+            "id": 4,
+            "title": "Establish Continuous Integration",
+            "description": "Set up GitHub Actions to run tests on every commit.",
+            "dependencies": [
+              "11.3"
+            ],
+            "details": "Create a GitHub Actions workflow that triggers pytest on each push to the repository.",
+            "status": "pending",
+            "testStrategy": "Verify that tests run successfully in the CI environment."
+          },
+          {
+            "id": 5,
+            "title": "Create Test Data Factories",
+            "description": "Implement test data factories using factory_boy for consistent test object creation.",
+            "dependencies": [
+              "11.4"
+            ],
+            "details": "Define factory classes for generating test data to ensure consistency across tests.",
+            "status": "pending",
+            "testStrategy": "Run tests that utilize the factories to confirm correct data generation."
+          }
+        ]
+      },
+      {
+        "id": 12,
+        "title": "Deployment and Infrastructure Automation",
+        "description": "Build comprehensive deployment infrastructure including Docker containerization, environment configuration, CI/CD pipeline setup, monitoring with Prometheus/Grafana, and production deployment automation.",
+        "details": "Create multi-stage Dockerfile for Python 3.11+ application with separate build and runtime stages to minimize image size. Configure docker-compose.yml for local development with services for the trading system, PostgreSQL/TimescaleDB for time-series data, Redis for caching, and monitoring stack. Implement environment-specific configuration using python-dotenv with .env.example template containing all required variables (BINANCE_TESTNET_API_KEY, IB_GATEWAY_HOST, etc.). Set up GitHub Actions CI/CD pipeline with workflows for testing (pytest with coverage), linting (black, flake8, mypy), security scanning (bandit, safety), and Docker image building/pushing to registry. Configure Kubernetes manifests using Helm charts for production deployment with ConfigMaps for environment variables, Secrets for API keys, HorizontalPodAutoscaler for scaling based on CPU/memory metrics, and health check probes. Implement monitoring infrastructure with Prometheus for metrics collection (custom metrics via prometheus_client), Grafana dashboards for visualization (trading performance, system health, resource usage), AlertManager for critical alerts (drawdown limits, connection failures), and log aggregation using Fluentd/Elasticsearch. Create deployment automation scripts using Ansible or Terraform for infrastructure provisioning on AWS/GCP/Azure, with support for blue-green deployments and automated rollback capabilities. Implement backup and disaster recovery procedures including automated database backups to S3/GCS, configuration state management, and documented recovery procedures. Ensure security best practices with non-root container user, secrets management via HashiCorp Vault or cloud KMS, network policies for pod-to-pod communication, and TLS encryption for all external endpoints.",
+        "testStrategy": "Verify Docker build process by running 'docker build -t silvertine:test .' and checking image size is under 500MB. Test local development environment with 'docker-compose up' and verify all services start successfully with health checks passing. Validate CI/CD pipeline by pushing test branch and confirming all GitHub Actions workflows complete successfully including test coverage >75%, linting passes, and Docker image is pushed to registry. Test Kubernetes deployment in staging environment by applying Helm charts and verifying pods are running, services are accessible, and autoscaling triggers correctly under load. Verify monitoring setup by generating test metrics and confirming they appear in Prometheus (query rate(http_requests_total[5m])) and Grafana dashboards display correctly. Test alerting by triggering threshold breaches and confirming notifications are sent via configured channels (email/Slack/PagerDuty). Perform disaster recovery drill by simulating database failure and executing recovery procedures to restore within RTO of 1 hour. Conduct security audit using tools like Trivy for container scanning and ensure no critical vulnerabilities are present. Load test production deployment with simulated trading activity to verify system handles 1000 events/second with <100ms latency as per performance requirements.",
+        "status": "pending",
+        "dependencies": [
+          11,
+          10,
+          9
+        ],
+        "priority": "medium",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Create Multi-Stage Dockerfile",
+            "description": "Develop a multi-stage Dockerfile for the Python 3.11+ application to optimize image size by separating build and runtime stages.",
+            "dependencies": [],
+            "details": "Ensure the Dockerfile minimizes the final image size while maintaining all necessary dependencies for the application to run.",
+            "status": "pending",
+            "testStrategy": "Verify Docker build process by running 'docker build -t silvertine:test .' and checking image size is under 500MB."
+          },
+          {
+            "id": 2,
+            "title": "Configure docker-compose.yml",
+            "description": "Set up a docker-compose.yml file for local development, including services for the trading system, PostgreSQL/TimescaleDB, Redis, and monitoring stack.",
+            "dependencies": [],
+            "details": "Ensure all services are correctly defined and can communicate with each other as expected.",
+            "status": "pending",
+            "testStrategy": "Test local development environment with 'docker-compose up' and verify all services start successfully with health checks passing."
+          },
+          {
+            "id": 3,
+            "title": "Implement Environment Configuration",
+            "description": "Use python-dotenv to implement environment-specific configuration with a .env.example template containing all required variables.",
+            "dependencies": [],
+            "details": "Ensure that the application can load environment variables correctly for different environments.",
+            "status": "pending",
+            "testStrategy": "Validate that the application starts with the correct environment variables loaded from the .env file."
+          },
+          {
+            "id": 4,
+            "title": "Set Up CI/CD Pipeline with GitHub Actions",
+            "description": "Create GitHub Actions workflows for testing, linting, security scanning, and Docker image building/pushing.",
+            "dependencies": [],
+            "details": "Ensure that the CI/CD pipeline runs all necessary checks and builds the Docker image correctly.",
+            "status": "pending",
+            "testStrategy": "Validate CI/CD pipeline by pushing a test branch and ensuring all workflows pass successfully."
+          },
+          {
+            "id": 5,
+            "title": "Configure Kubernetes Manifests",
+            "description": "Create Kubernetes manifests using Helm charts for production deployment, including ConfigMaps, Secrets, and HorizontalPodAutoscaler.",
+            "dependencies": [],
+            "details": "Ensure that the deployment is scalable and secure, with proper health checks in place.",
+            "status": "pending",
+            "testStrategy": "Deploy the application to a test Kubernetes cluster and verify that all components are functioning as expected."
+          }
+        ]
+      },
+      {
+        "id": 13,
+        "title": "Implement Security and Compliance Infrastructure",
+        "description": "Build comprehensive security infrastructure for API authentication, encryption, audit logging, and access controls to ensure secure communication with exchanges and regulatory compliance.",
+        "details": "Implement JWT-based authentication system using PyJWT library with RS256 algorithm for API endpoints. Create a centralized secret management service using python-dotenv for development and AWS Secrets Manager/HashiCorp Vault integration for production environments. Store all sensitive credentials (BINANCE_TESTNET_API_KEY, BINANCE_TESTNET_SECRET_KEY, IB_GATEWAY_CREDENTIALS) securely with encryption at rest. Implement end-to-end encryption for all exchange communications using TLS 1.3 with certificate pinning for Binance and IB Gateway connections. Create comprehensive audit logging system that tracks all trading activities, API calls, configuration changes, and risk events with structured JSON format including timestamp, user/system identifier, action type, request/response data, and outcome. Store audit logs in separate secure storage with retention policies (90 days minimum). Implement rate limiting using Redis-based token bucket algorithm with configurable limits per endpoint (e.g., 10 requests/second for trading endpoints, 100 requests/second for market data). Create IP whitelisting functionality with dynamic management interface, supporting both IPv4 and IPv6 addresses with CIDR notation. Implement request signing for exchange APIs using HMAC-SHA256 for Binance and IB's proprietary signing mechanism. Add security headers (X-Frame-Options, X-Content-Type-Options, Strict-Transport-Security) to all API responses. Create security monitoring dashboard showing authentication failures, rate limit violations, and suspicious activities. Implement automatic security incident response with configurable actions (alert, temporary block, full system shutdown). Ensure all security measures comply with financial industry standards including PCI DSS principles for handling sensitive financial data.",
+        "testStrategy": "Create comprehensive security test suite using pytest-security plugin. Test JWT authentication by generating valid and invalid tokens, verifying expiration handling, and testing token refresh flow. Validate secret management by ensuring no hardcoded secrets exist in codebase using tools like detect-secrets and truffleHog. Test encryption implementation by intercepting network traffic with mitmproxy and verifying all exchange communications are encrypted. Validate audit logging by performing various trading operations and verifying complete audit trail with no missing events, checking log integrity and tamper-evidence. Test rate limiting by sending burst requests exceeding limits and verifying appropriate 429 responses with Retry-After headers. Test IP whitelisting by attempting connections from allowed and blocked IPs, including IPv6 addresses. Perform penetration testing using OWASP ZAP to identify common vulnerabilities (SQL injection, XSS, CSRF). Test security incident response by simulating various attack scenarios (brute force authentication, DDoS attempt) and verifying automatic responses. Validate compliance by running automated compliance checks against audit logs ensuring all required fields are present and properly formatted. Perform 24-hour security stress test monitoring for any security violations or bypasses.",
+        "status": "pending",
+        "dependencies": [
+          2,
+          3,
+          9
+        ],
+        "priority": "medium",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Implement JWT Authentication",
+            "description": "Develop a JWT-based authentication system using the PyJWT library with RS256 algorithm for API endpoints.",
+            "dependencies": [],
+            "details": "Ensure that the authentication system can generate, validate, and refresh tokens securely.",
+            "status": "pending",
+            "testStrategy": "Create tests to validate token generation, expiration handling, and refresh flow."
+          },
+          {
+            "id": 2,
+            "title": "Create Centralized Secret Management",
+            "description": "Build a centralized secret management service using python-dotenv for development and integrate AWS Secrets Manager/HashiCorp Vault for production.",
+            "dependencies": [],
+            "details": "Store sensitive credentials securely with encryption at rest and ensure no hardcoded secrets exist in the codebase.",
+            "status": "pending",
+            "testStrategy": "Validate secret management by ensuring no hardcoded secrets exist and that secrets can be retrieved securely."
+          },
+          {
+            "id": 3,
+            "title": "Implement End-to-End Encryption",
+            "description": "Set up end-to-end encryption for all exchange communications using TLS 1.3 with certificate pinning for Binance and IB Gateway connections.",
+            "dependencies": [],
+            "details": "Ensure that all communications are encrypted and secure against man-in-the-middle attacks.",
+            "status": "pending",
+            "testStrategy": "Test the encryption setup by simulating communication and verifying that data is encrypted in transit."
+          },
+          {
+            "id": 4,
+            "title": "Develop Audit Logging System",
+            "description": "Create a comprehensive audit logging system that tracks trading activities, API calls, and configuration changes.",
+            "dependencies": [],
+            "details": "Logs should be structured in JSON format and stored securely with retention policies of at least 90 days.",
+            "status": "pending",
+            "testStrategy": "Implement tests to verify that all relevant actions are logged correctly and that logs can be retrieved securely."
+          },
+          {
+            "id": 5,
+            "title": "Implement Rate Limiting and IP Whitelisting",
+            "description": "Set up rate limiting using a Redis-based token bucket algorithm and create IP whitelisting functionality with dynamic management.",
+            "dependencies": [],
+            "details": "Rate limits should be configurable per endpoint, and the IP whitelisting should support both IPv4 and IPv6 addresses.",
+            "status": "pending",
+            "testStrategy": "Test rate limiting by simulating requests and verifying that limits are enforced correctly."
+          }
+        ]
+      },
+      {
+        "id": 14,
+        "title": "Implement Configuration Management System",
+        "description": "Design and implement a centralized configuration management system that organizes all settings under config/ directory with environment-specific support, validation, and secure credential handling.",
+        "details": "Create a hierarchical configuration structure under config/ directory following best practices for Python applications. Implement config/base.py as the main configuration module using Pydantic for type validation and environment variable support. Structure configuration files as: config/environments/{development,staging,production}.py for environment-specific settings, config/exchanges/{binance,interactive_brokers}.py for exchange API configurations, config/strategies/default.py for strategy parameters, config/risk.py for risk management thresholds and limits, config/logging.py for logging configuration using Python's logging.config.dictConfig, and config/database.py for database connection settings. Use python-dotenv to load environment variables from .env files with a comprehensive .env.example template. Implement a ConfigManager class that merges base configuration with environment-specific overrides, validates all configuration values using Pydantic models, supports dynamic reloading of configuration without system restart, encrypts sensitive values in memory using cryptography library, and provides type-safe access to configuration values throughout the application. Create configuration schemas for each module: ExchangeConfig with fields for api_key, secret_key, testnet flag, rate limits; StrategyConfig with parameters, indicators, timeframes; RiskConfig with position_limit, max_drawdown, stop_loss_percentage; DatabaseConfig with connection strings, pool settings, timeout values. Implement configuration validation that checks required fields are present, validates numeric ranges (e.g., 0 < stop_loss < 1), ensures API keys match expected patterns, validates URLs and connection strings, and provides clear error messages for misconfiguration. Support configuration precedence: environment variables override file settings, environment-specific files override base configuration, and runtime updates override static configuration. Include helper functions for getting typed configuration values, checking if running in production/development, safely accessing nested configuration, and exporting configuration for debugging.",
+        "testStrategy": "Create comprehensive test suite for configuration management using pytest. Test configuration loading by creating test config files in tests/fixtures/config/, verifying correct precedence when environment variables override file settings, and ensuring invalid configurations raise appropriate ValidationError. Test environment-specific loading by mocking different environments (development, staging, production) and verifying correct files are loaded and merged. Validate configuration schema enforcement by testing Pydantic models reject invalid types and values, required fields raise errors when missing, and numeric constraints are enforced (e.g., risk percentages between 0-1). Test secure credential handling by ensuring sensitive values are never logged or exposed in error messages, encryption/decryption works correctly for stored secrets, and environment variables are properly sanitized. Create integration tests that verify configuration is correctly injected into broker connections, strategy initialization uses correct parameters, and risk management respects configured limits. Test configuration reloading by modifying config files and verifying changes are detected, ensuring system components receive updated configuration, and validating no service interruption occurs during reload. Verify configuration export functionality masks sensitive values, provides complete configuration tree for debugging, and maintains proper JSON/YAML formatting. Performance test configuration access to ensure sub-millisecond lookup times for frequently accessed values and minimal memory overhead for configuration storage.",
+        "status": "pending",
+        "dependencies": [
+          2,
+          3,
+          5,
+          8,
+          9,
+          11,
+          13
+        ],
+        "priority": "medium",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Create Base Configuration Module",
+            "description": "Implement config/base.py as the main configuration module using Pydantic for type validation and environment variable support.",
+            "dependencies": [],
+            "details": "This module will serve as the foundation for the configuration management system, ensuring that all configurations are validated and loaded correctly.",
+            "status": "pending",
+            "testStrategy": "Create unit tests to validate the loading and validation of configuration values."
+          },
+          {
+            "id": 2,
+            "title": "Structure Configuration Files",
+            "description": "Organize configuration files under config/ directory for different environments and modules.",
+            "dependencies": [
+              "14.1"
+            ],
+            "details": "Create the necessary configuration files for environments (development, staging, production) and specific modules (exchanges, strategies, risk, logging, database).",
+            "status": "pending",
+            "testStrategy": "Verify that each configuration file loads correctly and adheres to the expected structure."
+          },
+          {
+            "id": 3,
+            "title": "Implement ConfigManager Class",
+            "description": "Develop a ConfigManager class that merges base configuration with environment-specific overrides and supports dynamic reloading.",
+            "dependencies": [
+              "14.1",
+              "14.2"
+            ],
+            "details": "This class will handle the merging of configurations, validate values, and provide type-safe access to configuration throughout the application.",
+            "status": "pending",
+            "testStrategy": "Create tests to ensure that configuration merging and dynamic reloading work as expected."
+          },
+          {
+            "id": 4,
+            "title": "Configuration Validation Implementation",
+            "description": "Implement validation logic to check required fields, numeric ranges, and patterns for API keys and URLs.",
+            "dependencies": [
+              "14.1",
+              "14.2",
+              "14.3"
+            ],
+            "details": "Ensure that all configuration values are validated correctly and provide clear error messages for misconfigurations.",
+            "status": "pending",
+            "testStrategy": "Develop tests to validate that incorrect configurations raise appropriate validation errors."
+          },
+          {
+            "id": 5,
+            "title": "Environment Variable Support and Encryption",
+            "description": "Integrate python-dotenv for loading environment variables and implement encryption for sensitive values in memory.",
+            "dependencies": [
+              "14.1"
+            ],
+            "details": "This will ensure that sensitive information is handled securely and that environment variables can override file settings.",
+            "status": "pending",
+            "testStrategy": "Test the loading of environment variables and the encryption of sensitive values to ensure security."
+          }
+        ]
+      },
+      {
+        "id": 15,
+        "title": "Create Web-Based User Interface for Silvertine Trading System",
+        "description": "Develop a responsive web-based user interface for the Silvertine trading system using FastAPI for the backend and a modern frontend framework with WebSocket support for real-time trading updates.",
+        "details": "Implement a web interface using FastAPI as the backend framework and React for the frontend. The interface should support real-time updates through WebSocket connections to display live trading data and user interactions. Ensure the design is responsive for mobile access, utilizing CSS frameworks like Bootstrap or Tailwind CSS for styling. Integrate existing API endpoints from Task 9 to facilitate user actions such as placing trades, viewing account information, and monitoring market data. Implement state management in the frontend using tools like Redux or Context API to manage application state effectively. Ensure proper error handling and user feedback mechanisms are in place for a smooth user experience.",
+        "testStrategy": "Conduct usability testing to ensure the interface is intuitive and responsive across devices. Verify WebSocket connections are established and data is updated in real-time by simulating trading events. Perform integration tests to ensure all API endpoints are functioning correctly and returning expected data. Use tools like Jest and React Testing Library for frontend testing, and Postman for API endpoint verification.",
+        "status": "pending",
+        "dependencies": [
+          7,
+          9
+        ],
+        "priority": "medium",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Set Up FastAPI Backend",
+            "description": "Configure the FastAPI backend to handle API requests and WebSocket connections.",
+            "dependencies": [],
+            "details": "Install FastAPI and necessary dependencies. Create the main application file and set up routing for API endpoints.",
+            "status": "pending",
+            "testStrategy": "Verify that the FastAPI server runs correctly and responds to basic API requests."
+          },
+          {
+            "id": 2,
+            "title": "Develop React Frontend",
+            "description": "Create the React frontend application to interact with the FastAPI backend.",
+            "dependencies": [],
+            "details": "Set up a new React project using Create React App. Install necessary libraries such as Axios for API calls.",
+            "status": "pending",
+            "testStrategy": "Ensure the React application compiles and runs without errors."
+          },
+          {
+            "id": 3,
+            "title": "Implement WebSocket Support",
+            "description": "Integrate WebSocket functionality in the frontend to receive real-time trading updates.",
+            "dependencies": [
+              "15.1",
+              "15.2"
+            ],
+            "details": "Use a WebSocket library to connect to the FastAPI backend and handle incoming messages for live updates.",
+            "status": "pending",
+            "testStrategy": "Test the WebSocket connection to ensure real-time data is received and displayed correctly."
+          },
+          {
+            "id": 4,
+            "title": "Integrate API Endpoints",
+            "description": "Connect the frontend to existing API endpoints for user actions like placing trades and viewing account information.",
+            "dependencies": [
+              "15.3"
+            ],
+            "details": "Use Axios to make API calls from the React components to the FastAPI backend, handling responses appropriately.",
+            "status": "pending",
+            "testStrategy": "Perform integration tests to ensure API calls work as expected and data is displayed correctly in the UI."
+          },
+          {
+            "id": 5,
+            "title": "Implement Responsive Design",
+            "description": "Ensure the web interface is responsive and user-friendly across different devices.",
+            "dependencies": [
+              "15.2"
+            ],
+            "details": "Utilize CSS frameworks like Bootstrap or Tailwind CSS to style the application and ensure it adapts to various screen sizes.",
+            "status": "pending",
+            "testStrategy": "Conduct usability testing on multiple devices to verify the responsiveness and user experience."
+          }
+        ]
+      }
+    ],
+    "metadata": {
+      "created": "2025-07-20T11:47:16.984Z",
+      "updated": "2025-07-20T15:44:51.108Z",
+      "description": "Tasks for master context"
+    }
+  }
+}

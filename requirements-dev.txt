@@ -1,0 +1,21 @@
+# Development dependencies for Silvertine trading system
+-r requirements.txt
+
+# Testing framework
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+pytest-cov>=4.1.0
+pytest-mock>=3.12.0
+pytest-xdist>=3.3.0
+httpx>=0.25.0
+coverage[toml]>=7.3.0
+
+# Code quality and formatting
+black>=23.9.0
+mypy>=1.6.0
+ruff>=0.1.0
+pre-commit>=3.5.0
+
+# Optional monitoring tools for development
+grafana-api>=1.0.3
+prometheus-api-client>=0.5.3
