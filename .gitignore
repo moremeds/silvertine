@@ -144,7 +144,7 @@ coverage.xml
 .ruff_cache/
 
 # Runtime data and cache (Silvertine-specific)
-cache/
+silver_cache/
 *.db
 *.sqlite
 *.sqlite3

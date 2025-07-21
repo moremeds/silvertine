@@ -1,7 +1,7 @@
 # Task ID: 13
 # Title: Implement Security and Compliance Infrastructure
 # Status: pending
-# Dependencies: 2, 3, 9
+# Dependencies: 2, 3, 9, 16
 # Priority: medium
 # Description: Build comprehensive security infrastructure for API authentication, encryption, audit logging, and access controls to ensure secure communication with exchanges and regulatory compliance.
 # Details:

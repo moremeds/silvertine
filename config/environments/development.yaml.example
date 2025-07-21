@@ -15,7 +15,7 @@ event_bus:
   
 # Database configuration
 database:
-  url: "sqlite:///cache/sqlite/silvertine_dev.db"
+  url: "sqlite:///silver_cache/sqlite/silvertine_dev.db"
   echo: true  # Log SQL queries in development
   pool_size: 5
   max_overflow: 10

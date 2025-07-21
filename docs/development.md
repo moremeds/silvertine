@@ -158,7 +158,7 @@ database:
   url: "${DATABASE_URL}"  # Injected from environment
 
 # .env file
-DATABASE_URL=sqlite:///cache/sqlite/silvertine_dev.db
+DATABASE_URL=sqlite:///silver_cache/sqlite/silvertine_dev.db
 ```
 
 **Validation**: All configuration must be validated at startup

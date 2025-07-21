@@ -77,7 +77,7 @@
         "dependencies": [
           1
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -85,7 +85,7 @@
             "description": "Create the foundational event system architecture with abstract base classes and interfaces for the four core event types (MarketDataEvent, OrderEvent, FillEvent, SignalEvent) using Python's asyncio library.",
             "dependencies": [],
             "details": "Define abstract base Event class with common attributes (event_id, timestamp, event_type). Create concrete event classes for MarketDataEvent (symbol, price, volume, bid/ask), OrderEvent (order_id, symbol, direction, quantity, order_type), FillEvent (order_id, symbol, executed_qty, executed_price, commission), and SignalEvent (symbol, signal_type, strength, strategy_id). Implement event serialization/deserialization methods for Redis persistence. Use dataclasses or Pydantic models for type safety and validation.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Write unit tests for each event class verifying proper instantiation, validation of required fields, serialization to/from Redis format, and immutability of event objects. Test edge cases like missing fields, invalid data types, and extreme values."
           },
           {
@@ -96,7 +96,7 @@
               "2.1"
             ],
             "details": "Create RedisStreamManager class to handle Redis connection pooling using aioredis. Implement methods for creating streams (one per event type), publishing events with XADD command, consuming events with XREAD/XREADGROUP, and managing consumer groups. Add connection retry logic with exponential backoff. Implement event replay functionality using XRANGE for historical event retrieval. Configure Redis persistence settings (AOF/RDB) for durability.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Create integration tests using a test Redis instance or redis-py-fakeredis. Test connection establishment and reconnection scenarios, event publishing to correct streams, consumer group creation and message acknowledgment, event replay from specific timestamps, and handling of Redis connection failures."
           },
           {
@@ -108,7 +108,7 @@
               "2.2"
             ],
             "details": "Create EventBus class using asyncio.Queue for in-memory event buffering. Implement publish() and subscribe() methods with topic-based routing. Add event handler registration with priority support. Ensure FIFO ordering within each event type using separate queues. Implement idempotency by tracking processed event IDs in a time-windowed cache. Add circuit breaker pattern for failing handlers. Create event processing metrics (throughput, latency, error rates).",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Write comprehensive unit tests for event routing, handler execution order, and concurrent event processing. Test idempotency by publishing duplicate events and verifying single processing. Verify FIFO ordering under high concurrency. Test circuit breaker activation on handler failures."
           },
           {
@@ -120,7 +120,7 @@
               "2.3"
             ],
             "details": "Implement EventProcessor class that bridges Redis Streams and the asyncio event bus. Create separate asyncio tasks for each event stream consumer. Implement backpressure handling to prevent memory overflow. Add event transformation and validation before routing. Implement dead letter queue for failed events. Create event processing checkpoints for recovery. Add graceful shutdown handling with in-flight event completion.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Create end-to-end integration tests simulating full event flow from Redis to handlers. Test backpressure by generating high event volumes and monitoring memory usage. Verify checkpoint recovery by simulating crashes and restarts. Test graceful shutdown with pending events."
           },
           {
@@ -132,8 +132,64 @@
               "2.4"
             ],
             "details": "Create EventMonitor class for real-time event flow visualization and metrics collection. Implement event replay coordinator that can replay events from specific time ranges or event IDs. Add replay speed control (real-time, accelerated, or step-by-step). Create event filtering capabilities for replay (by type, symbol, or custom predicates). Implement event audit trail with full event history. Add Prometheus metrics export for event processing statistics.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test replay functionality by recording live event sequences and replaying them, verifying identical system state. Test monitoring accuracy by comparing reported metrics with actual event counts. Verify replay filtering works correctly with various predicates. Test performance impact of monitoring on event processing throughput."
+          },
+          {
+            "id": 6,
+            "title": "Implement Event Ordering and Sequencing Guarantees",
+            "description": "Design and implement strict event ordering mechanisms to ensure tick-by-tick data integrity for high-frequency trading scenarios",
+            "details": "Create sequence number generation for all events with monotonic incrementing. Implement event buffering mechanism to handle out-of-order arrivals due to network latency. Design a sliding window approach to reorder events based on timestamps and sequence numbers. Add event ordering validation layer to detect and report sequence gaps. Implement configurable ordering policies (strict vs best-effort) based on event type. Ensure FIFO processing within each event type queue while maintaining cross-queue dependencies.",
+            "status": "done",
+            "dependencies": [
+              "2.1"
+            ],
+            "parentTaskId": 2
+          },
+          {
+            "id": 7,
+            "title": "Implement Backpressure and Flow Control Mechanisms",
+            "description": "Create comprehensive backpressure handling to manage market data bursts and prevent system overload during high-volume trading periods",
+            "details": "Implement adaptive queue sizing with dynamic limits based on system resources. Create producer throttling mechanism using async semaphores and rate limiting. Design consumer feedback system to signal upstream components when queues reach capacity. Implement load shedding strategies for non-critical events during extreme conditions. Add configurable buffer sizes with overflow policies (drop oldest, drop newest, block). Create metrics for queue depth monitoring and backpressure events. Implement circuit breaker pattern for automatic recovery from overload situations.",
+            "status": "done",
+            "dependencies": [
+              "2.3"
+            ],
+            "parentTaskId": 2
+          },
+          {
+            "id": 8,
+            "title": "Implement Event Priority System and Critical Path Optimization",
+            "description": "Create a multi-tier priority system to ensure critical trading events (orders, fills) are processed before less critical events (market data) during high-load scenarios",
+            "details": "Design priority levels: CRITICAL (order operations), HIGH (risk events), NORMAL (market data), LOW (monitoring). Implement priority-aware event queues with separate processing lanes for each priority tier. Create fast-track processing path for critical events bypassing normal queues. Add preemption mechanism to pause low-priority processing for critical events. Implement dynamic priority elevation based on event age and business rules. Design priority inheritance to prevent priority inversion issues. Add configurable priority mappings for different trading strategies and market conditions.",
+            "status": "done",
+            "dependencies": [
+              "2.3"
+            ],
+            "parentTaskId": 2
+          },
+          {
+            "id": 9,
+            "title": "Implement High-Precision Time Synchronization System",
+            "description": "Create microsecond-precision timestamping with NTP synchronization for accurate event sequencing and latency measurement in high-frequency trading",
+            "details": "Implement high-resolution timer using time.perf_counter_ns() for nanosecond precision. Create NTP client integration for clock synchronization with configurable NTP servers. Design timestamp hierarchy: hardware timestamp, kernel timestamp, application timestamp. Implement clock drift detection and compensation algorithms. Add monotonic clock guarantees to prevent time reversals. Create latency measurement framework tracking event journey through system. Implement time zone handling with all timestamps in UTC. Design timestamp validation to detect and reject events with impossible timestamps.",
+            "status": "done",
+            "dependencies": [
+              "2.1"
+            ],
+            "parentTaskId": 2
+          },
+          {
+            "id": 10,
+            "title": "Optimize Memory Management for High-Throughput Trading",
+            "description": "Implement advanced memory management techniques to handle millions of events per second with minimal GC pressure and optimal cache utilization",
+            "details": "Create object pools for event instances to reduce allocation overhead using asyncio-based pool. Implement ring buffer for event queues with pre-allocated memory to minimize GC. Design memory-mapped queues for ultra-low latency inter-process communication. Add memory pressure monitoring with automatic throttling when approaching limits. Implement zero-copy event passing where possible using memoryview. Create event batching strategies to amortize allocation costs. Design cache-friendly data structures aligned to CPU cache lines. Add memory profiling hooks to identify and eliminate memory leaks. Implement configurable memory limits per event type with overflow strategies.",
+            "status": "done",
+            "dependencies": [
+              "2.3",
+              "2.7"
+            ],
+            "parentTaskId": 2
           }
         ]
       },
@@ -145,64 +201,81 @@
         "testStrategy": "Test the broker interface with mock data to ensure correct order execution and position management.",
         "priority": "high",
         "dependencies": [
-          2
+          "16"
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
-            "title": "Design AbstractBroker Base Class",
-            "description": "Create the abstract base class defining the standard broker interface with all required methods and properties",
+            "title": "Enhance AbstractBroker with Event-Driven Integration",
+            "description": "Refactor the AbstractBroker class to support event-driven architecture for better scalability and responsiveness.",
             "dependencies": [],
-            "details": "Define AbstractBroker as an abstract base class with abstract methods for order placement (place_order, cancel_order, modify_order), position management (get_positions, get_position), account queries (get_balance, get_account_info), market data (get_quote, get_orderbook), and connection management (connect, disconnect, is_connected). Include proper type hints, docstrings, and error handling specifications. Define standard data classes for Order, Position, Balance, and AccountInfo.",
-            "status": "pending",
-            "testStrategy": "Create unit tests for the abstract interface validation, ensuring all required methods are defined and properly typed. Test that concrete implementations must override all abstract methods."
+            "details": "Implement event listeners and handlers within the AbstractBroker class to facilitate asynchronous order management and position queries.\n<info added on 2025-07-21T07:20:39.381Z>\nUpdate the AbstractBroker class to include the following async methods: place_order, cancel_order, get_positions, and get_account_info. Implement event-driven integration by subscribing to OrderEvents and publishing FillEvents. Define data structures for BrokerPosition, BrokerBalance, and BrokerAccountInfo with appropriate type hints. Manage connection states with the following statuses: DISCONNECTED, CONNECTING, CONNECTED, and ERROR. Collect performance metrics including order latencies, fill rates, and connection uptime. Ensure the implementation is located in silvertine/exchanges/ibroker.py, adhering to an interface-first architecture.\n</info added on 2025-07-21T07:20:39.381Z>",
+            "status": "done",
+            "testStrategy": "Create unit tests to verify event handling and integration tests to ensure proper event propagation."
           },
           {
             "id": 2,
-            "title": "Implement Paper Trading Simulator",
-            "description": "Develop a paper trading broker implementation that simulates realistic trading behavior with configurable parameters",
-            "dependencies": [
-              "3.1"
-            ],
-            "details": "Create PaperTradingBroker class inheriting from AbstractBroker. Implement simulated order execution with configurable slippage models (fixed, percentage, market impact), realistic fill simulation based on order book depth, position tracking with P&L calculation, balance management with margin requirements, and order state management (pending, filled, cancelled, rejected). Include configurable latency simulation and partial fill support. Store execution history for analysis.",
-            "status": "pending",
-            "testStrategy": "Test order execution with various market conditions, verify slippage calculations, test position tracking accuracy, validate balance updates after trades, test edge cases like insufficient funds and margin calls."
+            "title": "Develop Realistic Paper Trading Simulator",
+            "description": "Create a paper trading simulator that accurately mimics real trading behavior with multiple slippage models.",
+            "dependencies": [],
+            "details": "Implement various slippage models to simulate realistic market conditions and test order execution.\n<info added on 2025-07-21T07:21:16.895Z>\nImplement a detailed paper trading implementation as follows: 1) Create the PaperTradingBroker class with a configurable PaperTradingConfig that includes initial_balance, latency_ms, and slippage models. 2) Implement three slippage models: FIXED, PERCENTAGE, and MARKET_IMPACT with realistic calculations. 3) Simulate order execution supporting market, limit, and stop orders. 4) Include partial fill simulation and commission tracking. 5) Track position P&L with current price updates from market data events. 6) Manage balance with margin support. 7) Save the implementation in the file located at silvertine/exchanges/paper/paper_broker.py.\n</info added on 2025-07-21T07:21:16.895Z>",
+            "status": "done",
+            "testStrategy": "Simulate different market scenarios to validate the accuracy of the paper trading simulator."
           },
           {
             "id": 3,
-            "title": "Create Binance Exchange Adapter",
-            "description": "Implement the Binance broker adapter supporting both testnet and production environments",
-            "dependencies": [
-              "3.1"
-            ],
-            "details": "Develop BinanceBroker class implementing AbstractBroker interface. Integrate with Binance REST API for order management and account queries, WebSocket streams for real-time updates, and handle API rate limiting with automatic throttling. Implement order type mapping (market, limit, stop-loss, take-profit), position calculation from balance changes, error handling with automatic retry logic, and support for both spot and futures trading. Include testnet/production environment switching.",
-            "status": "pending",
-            "testStrategy": "Test against Binance testnet API, verify order placement and cancellation, test WebSocket reconnection logic, validate rate limiting compliance, test error handling for network issues and API errors."
+            "title": "Implement Binance Adapter with WebSocket Streams",
+            "description": "Develop an adapter for Binance that utilizes WebSocket streams for real-time data and implements rate limiting.",
+            "dependencies": [],
+            "details": "Integrate Binance API for order management and market data retrieval, ensuring compliance with rate limits.\n<info added on 2025-07-21T07:21:45.082Z>\nImplement the BinanceBroker class using aiohttp for REST API calls, ensuring compliance with rate limits of 1200 requests per minute and 10 orders per second. Integrate WebSocket for user data streams and market data using the ThreadedWebsocketManager pattern. Implement authentication with HMAC SHA256 signature generation. Map order types to Binance equivalents: MARKET, LIMIT, STOP_LOSS, and STOP_LOSS_LIMIT. Include functionality for switching between testnet and production environments. Implement error handling with exponential backoff for rate limits. The implementation will be located in silvertine/exchanges/binance/binance_broker.py.\n</info added on 2025-07-21T07:21:45.082Z>",
+            "status": "done",
+            "testStrategy": "Conduct integration tests to verify WebSocket stability and data accuracy under load."
           },
           {
             "id": 4,
-            "title": "Develop Interactive Brokers Adapter",
-            "description": "Create the Interactive Brokers adapter with support for multiple asset classes and paper trading",
-            "dependencies": [
-              "3.1"
-            ],
-            "details": "Implement InteractiveBrokersBroker class using ib_insync library. Handle IB Gateway/TWS connection management with automatic reconnection, implement order routing for stocks, futures, and forex, manage IB's asynchronous API with proper event handling, track positions across multiple accounts, handle market data subscriptions and throttling. Include contract search and validation, commission tracking, and support for complex order types (bracket, trailing stop).",
-            "status": "pending",
-            "testStrategy": "Test with IB paper trading account, verify connection stability over extended periods, test order execution across different asset classes, validate position synchronization, test handling of API disconnections and errors."
+            "title": "Create Interactive Brokers Adapter with ib_insync Integration",
+            "description": "Implement an adapter for Interactive Brokers using the ib_insync library for simplified API interactions.",
+            "dependencies": [],
+            "details": "Ensure the adapter supports order management, position queries, and balance management through ib_insync.\n<info added on 2025-07-21T07:22:14.553Z>\nImplement the InteractiveBrokersBroker class using the ib_insync library for async API integration. Include connection management to IB Gateway/TWS with automatic reconnection. Support multi-asset trading (STK, CASH/Forex, FUT, OPT, CRYPTO) with contract resolution. Implement order type mapping for MKT, LMT, STP, STP LMT, and support complex orders such as bracket and trailing. Add event handlers for order status, executions, and position updates. Ensure support for paper trading accounts with commission tracking. The implementation will be located in silvertine/exchanges/ib/ib_broker.py.\n</info added on 2025-07-21T07:22:14.553Z>",
+            "status": "done",
+            "testStrategy": "Perform unit tests to validate API interactions and integration tests for end-to-end functionality."
           },
           {
             "id": 5,
-            "title": "Build Broker Factory and Configuration System",
-            "description": "Create a factory pattern for broker instantiation with comprehensive configuration management",
-            "dependencies": [
-              "3.2",
-              "3.3",
-              "3.4"
-            ],
-            "details": "Implement BrokerFactory class with dynamic broker selection based on configuration. Create YAML-based configuration system for broker settings, credentials management with environment variable support, connection parameters, and trading rules. Include broker health monitoring with automatic failover, performance metrics collection (latency, success rate), and unified error handling across all broker implementations. Add broker-specific configuration validation and testing utilities.",
-            "status": "pending",
-            "testStrategy": "Test factory instantiation of all broker types, verify configuration loading and validation, test failover mechanisms, validate metrics collection, test configuration templates and environment variable substitution."
+            "title": "Develop BrokerFactory with Dynamic Configuration Loading",
+            "description": "Create a BrokerFactory class that dynamically loads configurations for different brokers at runtime.",
+            "dependencies": [],
+            "details": "Implement configuration management to allow easy addition of new brokers without code changes.\n<info added on 2025-07-21T07:33:59.503Z>\nImplement detailed implementation specifics for the BrokerFactory pattern as follows:\n\n1. **Dynamic Configuration Loading**:\n   - Utilize YAML configuration files with environment variable substitution.\n   - Template: `config/exchanges/broker_template.yaml` with ${BROKER_TYPE}, ${API_KEY} patterns.\n   - Include broker-specific sections for credentials, connection, trading, and risk_limits.\n\n2. **BrokerRegistry Pattern**:\n   - Implement registry-based broker discovery using `BrokerRegistry.get(config.broker_type)`.\n   - Enable auto-registration of broker implementations via decorators.\n   - Support plugin-style broker loading from external modules.\n\n3. **Configuration Validation**:\n   - Use Pydantic models for type-safe configuration validation.\n   - Ensure required field validation occurs before broker instantiation.\n   - Implement broker-specific validation methods (e.g., validate_binance_config, validate_ib_config).\n\n4. **Factory Implementation**:\n   ```python\n   class BrokerFactory:\n       async def create_broker(self, name: str) -> AbstractBroker:\n           config = await self._load_config(name)\n           broker_class = BrokerRegistry.get(config.broker_type)\n           broker = broker_class(self.event_bus, config)\n           await broker.initialize()\n           return broker\n   ```\n\n5. **Environment Integration**:\n   - Support .env files for broker credentials.\n   - Implement production-safe secret management patterns.\n   - Allow multiple environment support (development, testing, production).\n\n6. **Error Handling**:\n   - Ensure graceful handling of missing configurations.\n   - Provide validation error reporting with clear messages.\n   - Implement fallback broker selection for redundancy.\n</info added on 2025-07-21T07:33:59.503Z>",
+            "status": "done",
+            "testStrategy": "Test the dynamic loading of configurations with various broker setups to ensure flexibility."
+          },
+          {
+            "id": 6,
+            "title": "Implement Comprehensive Error Handling and Reconnection Logic",
+            "description": "Develop robust error handling and reconnection logic for the broker interface to ensure reliability.",
+            "dependencies": [],
+            "details": "Implement retry mechanisms and error logging to handle connection issues and API errors gracefully.\n<info added on 2025-07-21T07:35:08.169Z>\nImplement comprehensive error handling and reconnection logic as follows:\n\n1. **Connection State Management**:\n   - Implement `ConnectionState` enum: `DISCONNECTED`, `CONNECTING`, `CONNECTED`, `ERROR`, `RECONNECTING`.\n   - Track connection health with heartbeat mechanisms.\n   - Automatic state transitions with proper logging.\n\n2. **Retry Patterns with Exponential Backoff**:\n   ```python\n   async def place_order_with_retry(self, order: OrderEvent) -> str:\n       max_retries = 3\n       for attempt in range(max_retries):\n           try:\n               return await self.place_order(order)\n           except RateLimitError:\n               await asyncio.sleep(2 ** attempt)\n           except ConnectionError:\n               await self.reconnect()\n   ```\n\n3. **Error Classification System**:\n   - **Recoverable Errors**: `RateLimitError`, `TemporaryConnectionError`, `TimeoutError`.\n   - **Non-Recoverable Errors**: `AuthenticationError`, `InsufficientFundsError`, `InvalidOrderError`.\n   - **Critical Errors**: `AccountSuspendedError`, `ExchangeMaintenanceError`.\n\n4. **WebSocket Reconnection Logic**:\n   - Automatic reconnection with progressive backoff (1s, 2s, 4s, 8s, max 60s).\n   - Listen key refresh for Binance user data streams.\n   - Connection health monitoring with ping/pong frames.\n   - Circuit breaker pattern to prevent cascade failures.\n\n5. **Error Reporting and Monitoring**:\n   - Structured error logging with context information.\n   - Error metrics collection (error counts by type).\n   - Alert system for critical connection failures.\n   - Health check endpoints for external monitoring.\n\n6. **Graceful Degradation**:\n   - Fallback to cached data when live feeds fail.\n   - Order queue persistence during disconnections.\n   - Failover between multiple data sources.\n   - Emergency stop mechanisms for critical failures.\n\n7. **Recovery Strategies**:\n   - State reconciliation after reconnection.\n   - Missed event replay using Redis Streams.\n   - Position synchronization with broker APIs.\n   - Order status verification post-reconnection.\n</info added on 2025-07-21T07:35:08.169Z>",
+            "status": "done",
+            "testStrategy": "Simulate connection failures to test the robustness of error handling and reconnection strategies."
+          },
+          {
+            "id": 7,
+            "title": "Integrate Performance Monitoring and Health Checks",
+            "description": "Implement performance monitoring and health checks for the broker interface to ensure system reliability.",
+            "dependencies": [],
+            "details": "Use monitoring tools to track performance metrics and implement health check endpoints for system status.\n<info added on 2025-07-21T07:35:59.131Z>\nImplement performance monitoring and health checks for the broker interface to ensure system reliability. \n\n**Key Implementation Details**:\n\n1. **Performance Metrics Collection**:\n   - Implement a `BrokerMetrics` class to track order latencies, fill rates, connection uptime, and error counts.\n   - Include methods to record order latency and calculate average latency.\n\n2. **Health Monitoring System**:\n   - Create a `BrokerHealthMonitor` class with an asynchronous method to check broker health, returning a health score based on connectivity and metrics.\n\n3. **Performance Requirements and Targets**:\n   - Ensure order latency is below 500ms average and below 1000ms for p99.\n   - Maintain WebSocket stability above 99% uptime and fill rate above 95%.\n   - API response time for account queries should be under 200ms, with memory usage capped at 1GB for the MVP system.\n\n4. **Real-time Monitoring Dashboard**:\n   - Develop a dashboard displaying live latency histograms, connection status indicators, order success/failure rates, API rate limit utilization, and memory/CPU usage.\n\n5. **Alerting System**:\n   - Set up alerts for latency exceeding 1000ms, connection failures, rate limit warnings at 80% utilization, error rates above 1%, and health scores below 0.7.\n\n6. **Performance Benchmarking**:\n   - Conduct automated performance tests for latency validation, concurrent order handling, stress testing, and memory leak detection.\n\n7. **Health Check Endpoints**:\n   - Implement endpoints: `/health` for basic status, `/health/detailed` for comprehensive metrics, and `/metrics` for Prometheus-compatible metrics export, integrating with external monitoring systems.\n</info added on 2025-07-21T07:35:59.131Z>",
+            "status": "done",
+            "testStrategy": "Conduct load testing to validate performance metrics and ensure health checks respond accurately."
+          },
+          {
+            "id": 8,
+            "title": "Conduct Integration Testing with Mock Responses",
+            "description": "Perform integration testing of the broker interface using mock responses to validate functionality.",
+            "dependencies": [],
+            "details": "Create mock responses for various broker interactions to ensure the interface behaves as expected.\n<info added on 2025-07-21T07:36:39.543Z>\nUpdate the subtask with detailed implementation specifics for integration testing with mock responses:\n\n**Key Implementation Details from Research**:\n\n1. **Testing Framework Setup**:\n   - Install necessary testing libraries:\n     ```\n     poetry add --group dev pytest pytest-asyncio pytest-cov pytest-benchmark\n     poetry add --group dev pytest-mock aioresponses pytest-timeout pytest-repeat\n     ```\n\n2. **Mock Response Patterns**:\n   - Example of Binance API mocking with aioresponses:\n     ```python\n     with aioresponses() as mocked:\n         mocked.post(\n             'https://testnet.binance.vision/api/v3/order',\n             payload={\n                 'orderId': 12345,\n                 'clientOrderId': 'TEST001',\n                 'status': 'NEW'\n             }\n         )\n     ```\n\n3. **End-to-End Event Flow Testing**:\n   - Test complete event flow from order creation to fill execution.\n   - Verify event sequence: MarketDataEvent → OrderEvent → FillEvent.\n   - Track all events through the event bus integration.\n   - Validate event timing and ordering guarantees.\n\n4. **Multi-Broker Integration Testing**:\n   - Test multiple brokers operating simultaneously.\n   - Verify independent operation and resource isolation.\n   - Test configuration loading for different broker types.\n   - Validate broker factory instantiation patterns.\n\n5. **WebSocket Connection Testing**:\n   - Mock WebSocket connections for user data streams.\n   - Test reconnection logic under simulated network failures.\n   - Validate listen key refresh mechanisms for Binance.\n   - Test connection health monitoring and circuit breakers.\n\n6. **Performance Integration Tests**:\n   - Benchmark order placement latency (target: <500ms).\n   - Test concurrent order handling (100+ orders).\n   - Validate throughput under simulated market conditions.\n   - Memory usage profiling during extended operations.\n\n7. **Error Scenario Testing**:\n   - Test rate limiting scenarios with 429 responses.\n   - Simulate connection failures and recovery.\n   - Test invalid order rejection handling.\n   - Validate authentication error responses.\n\n8. **Testing Organization**:\n   ```\n   tests/integration/\n   ├── test_broker_integration.py     # Core integration tests\n   ├── test_event_flow.py            # Event bus integration\n   ├── test_binance_integration.py   # Binance-specific tests\n   ├── test_ib_integration.py        # IB-specific tests\n   └── fixtures/                     # Mock responses and test data\n   ```\n\n9. **Continuous Integration Setup**:\n   - GitHub Actions workflow for integration testing.\n   - Coverage reporting with codecov integration.\n   - Performance regression detection.\n   - Automated testing on multiple Python versions.\n</info added on 2025-07-21T07:36:39.543Z>",
+            "status": "done",
+            "testStrategy": "Run integration tests with mock data to verify order execution and position management."
           }
         ]
       },
@@ -214,7 +287,7 @@
         "testStrategy": "Conduct integration tests to verify data aggregation from multiple sources and validate data quality checks.",
         "priority": "high",
         "dependencies": [
-          2
+          "16"
         ],
         "status": "pending",
         "subtasks": [
@@ -797,7 +870,8 @@
         "dependencies": [
           2,
           3,
-          9
+          9,
+          "16"
         ],
         "priority": "medium",
         "subtasks": [
@@ -990,11 +1064,156 @@
             "testStrategy": "Conduct usability testing on multiple devices to verify the responsiveness and user experience."
           }
         ]
+      },
+      {
+        "id": 16,
+        "title": "Implement Redis Streams Event Persistence Layer",
+        "description": "Add Redis Streams integration for event persistence, replay capabilities, and system recovery.",
+        "details": "Implement Redis connection management to ensure reliable connections to the Redis server. Create streams for each event type defined in Task 2 (MarketDataEvent, OrderEvent, FillEvent, SignalEvent). Develop mechanisms for publishing and consuming events from these streams, ensuring that events are processed in the correct order and are idempotent. Implement checkpoint management to track the last processed event, allowing for recovery in case of failures. Ensure that the system can handle event replay for debugging and recovery scenarios, providing a robust solution for event persistence.",
+        "testStrategy": "Verify the implementation by creating unit tests for Redis connection management, stream creation, and event publishing/consuming mechanisms. Conduct integration tests to ensure that events are persisted correctly in Redis and can be replayed accurately. Simulate failure scenarios to test the checkpoint management and recovery capabilities, ensuring that the system can recover to the last known good state without data loss.",
+        "status": "pending",
+        "dependencies": [
+          2
+        ],
+        "priority": "high",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Implement Redis Connection Management",
+            "description": "Develop a robust Redis connection management system that includes retry logic and connection pooling to ensure reliable connections to the Redis server.",
+            "dependencies": [],
+            "details": "Use the redis-py library to create a connection pool. Implement retry logic using a decorator that retries connection attempts a specified number of times with exponential backoff. Ensure that connections are properly closed when no longer needed.",
+            "status": "pending",
+            "testStrategy": "Create unit tests to verify connection establishment, retry logic, and connection pooling behavior."
+          },
+          {
+            "id": 2,
+            "title": "Create Redis Streams for Event Types",
+            "description": "Set up Redis Streams for each event type defined in Task 2: MarketDataEvent, OrderEvent, FillEvent, and SignalEvent.",
+            "dependencies": [
+              "16.1"
+            ],
+            "details": "Utilize the Redis connection established in the previous subtask to create streams for each event type. Use the XGROUP command to create consumer groups for each stream to facilitate event consumption.",
+            "status": "pending",
+            "testStrategy": "Verify the creation of streams and consumer groups through integration tests that check the existence of streams in Redis."
+          },
+          {
+            "id": 3,
+            "title": "Implement Event Publishing Mechanism",
+            "description": "Develop a mechanism to publish events to the Redis Streams with proper serialization to Redis format.",
+            "dependencies": [
+              "16.2"
+            ],
+            "details": "Create a function that takes an event object, serializes it to JSON format, and publishes it to the appropriate Redis Stream using the XADD command. Ensure that the function handles exceptions and logs errors appropriately.",
+            "status": "pending",
+            "testStrategy": "Write unit tests to validate the serialization process and the successful publishing of events to the streams."
+          },
+          {
+            "id": 4,
+            "title": "Implement Event Consumption with Acknowledgment",
+            "description": "Create a system for consuming events from the Redis Streams with acknowledgment and error handling.",
+            "dependencies": [
+              "16.3"
+            ],
+            "details": "Develop a consumer function that reads events from the stream using the XREADGROUP command. Implement acknowledgment of processed events using the XACK command. Include error handling to manage failed processing attempts and log errors.",
+            "status": "pending",
+            "testStrategy": "Conduct integration tests to ensure events are consumed correctly and acknowledged, and simulate failures to test error handling."
+          },
+          {
+            "id": 5,
+            "title": "Implement Checkpoint Management and Event Replay",
+            "description": "Develop a checkpoint management system to track the last processed event and implement event replay functionality for system recovery.",
+            "dependencies": [
+              "16.4"
+            ],
+            "details": "Create a mechanism to store the ID of the last processed event in a persistent store (e.g., Redis or a database). Implement a replay function that can read from the stream starting from the last checkpoint, allowing for event replay in case of failures.",
+            "status": "pending",
+            "testStrategy": "Test the checkpoint management and event replay functionality through unit tests and simulate recovery scenarios to validate the implementation."
+          },
+          {
+            "id": 6,
+            "title": "Implement Dead Letter Queue for Failed Events",
+            "description": "Create a robust dead letter queue system for handling events that fail processing, ensuring no critical trading data is lost",
+            "details": "Design separate Redis Stream for dead letter queue with configurable retention policy. Implement retry logic with exponential backoff (1s, 2s, 4s, 8s, 16s) before moving to DLQ. Create event failure classification: transient (retry), permanent (DLQ), poison (immediate DLQ). Add failure metadata: error message, stack trace, retry count, original timestamp. Implement DLQ monitoring with alerts for queue depth thresholds. Create manual replay mechanism for DLQ events after issue resolution. Design DLQ analytics to identify patterns in failures. Implement automatic DLQ draining for recovered transient failures.",
+            "status": "pending",
+            "dependencies": [
+              "16.4"
+            ],
+            "parentTaskId": 16
+          }
+        ]
+      },
+      {
+        "id": 17,
+        "title": "Implement Advanced Event Engine Optimizations",
+        "description": "Implement advanced performance features for the event-driven core engine, including event ordering guarantees, backpressure mechanisms, event priority systems, high-precision time synchronization, and memory management optimizations.",
+        "details": "This task involves several key optimizations for the event-driven core engine. First, implement event ordering and sequencing guarantees to ensure that events are processed in the correct order. Next, develop backpressure and flow control mechanisms to manage the rate of event processing and prevent system overload. Additionally, create an event priority system to handle critical events more efficiently. Implement high-precision time synchronization to ensure accurate event timing, which is crucial for high-throughput trading applications. Finally, optimize memory management to handle large volumes of events without degrading performance. Consider using data structures that minimize memory overhead and improve access times. Document the design decisions and any trade-offs made during implementation.",
+        "testStrategy": "To verify the implementation, create unit tests that validate the correctness of event ordering and priority handling. Simulate high-throughput scenarios to test the effectiveness of backpressure and flow control mechanisms, ensuring the system remains stable under load. Use performance benchmarks to measure the impact of memory management optimizations. Additionally, validate the accuracy of time synchronization by comparing event timestamps against a reliable time source. Conduct integration tests to ensure that all components work together seamlessly and meet the performance requirements.",
+        "status": "pending",
+        "dependencies": [
+          2
+        ],
+        "priority": "high",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Implement Event Ordering and Sequencing Guarantees",
+            "description": "Develop a system to ensure that events are processed in the correct order by implementing sequence number generation, event buffering for out-of-order arrivals, and a sliding window reordering mechanism.",
+            "dependencies": [],
+            "details": "Utilize a sequence number for each event to maintain order. Implement a buffer to temporarily hold out-of-order events and a sliding window algorithm to reorder them based on their sequence numbers before processing.",
+            "status": "pending",
+            "testStrategy": "Create unit tests to validate the ordering of events and ensure that out-of-order events are correctly buffered and reordered."
+          },
+          {
+            "id": 2,
+            "title": "Develop Backpressure and Flow Control Mechanisms",
+            "description": "Create adaptive queue sizing, producer throttling, and load shedding strategies to manage the rate of event processing and prevent system overload.",
+            "dependencies": [
+              "17.1"
+            ],
+            "details": "Implement a dynamic queue that adjusts its size based on the current load. Introduce throttling for producers to limit the rate of event generation and develop load shedding strategies to drop less critical events when the system is under heavy load.",
+            "status": "pending",
+            "testStrategy": "Simulate high-throughput scenarios to test the effectiveness of backpressure mechanisms and ensure system stability under load."
+          },
+          {
+            "id": 3,
+            "title": "Create Event Priority System",
+            "description": "Implement a multi-tier priority queue system to handle critical events more efficiently, including fast-track processing and preemption mechanisms.",
+            "dependencies": [
+              "17.2"
+            ],
+            "details": "Design a priority queue that categorizes events into different tiers based on their importance. Implement fast-track processing for high-priority events and allow preemption of lower-priority events when necessary.",
+            "status": "pending",
+            "testStrategy": "Run tests to ensure that high-priority events are processed before lower-priority ones and that preemption works as intended."
+          },
+          {
+            "id": 4,
+            "title": "Implement High-Precision Time Synchronization",
+            "description": "Ensure accurate event timing through microsecond timestamping, NTP synchronization, and latency measurement.",
+            "dependencies": [
+              "17.3"
+            ],
+            "details": "Integrate NTP for time synchronization and implement a mechanism to timestamp events with microsecond precision. Measure and log latency to identify potential delays in event processing.",
+            "status": "pending",
+            "testStrategy": "Verify timestamp accuracy and synchronization by comparing timestamps against a reliable time source and measuring latency under various conditions."
+          },
+          {
+            "id": 5,
+            "title": "Optimize Memory Management",
+            "description": "Implement memory management optimizations using object pools, ring buffers, and zero-copy event passing to handle large volumes of events efficiently.",
+            "dependencies": [
+              "17.4"
+            ],
+            "details": "Create object pools for frequently used event objects to reduce memory allocation overhead. Use ring buffers for event storage to minimize memory fragmentation and implement zero-copy techniques for high-throughput event passing.",
+            "status": "pending",
+            "testStrategy": "Conduct performance benchmarks to measure memory usage and access times, ensuring that optimizations lead to improved performance without memory leaks."
+          }
+        ]
       }
     ],
     "metadata": {
       "created": "2025-07-20T11:47:16.984Z",
-      "updated": "2025-07-20T15:44:51.108Z",
+      "updated": "2025-07-21T15:37:34.973Z",
       "description": "Tasks for master context"
     }
   }

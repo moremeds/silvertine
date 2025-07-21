@@ -1,0 +1,49 @@
+# Task ID: 16
+# Title: Implement Redis Streams Event Persistence Layer
+# Status: pending
+# Dependencies: 2
+# Priority: high
+# Description: Add Redis Streams integration for event persistence, replay capabilities, and system recovery.
+# Details:
+Implement Redis connection management to ensure reliable connections to the Redis server. Create streams for each event type defined in Task 2 (MarketDataEvent, OrderEvent, FillEvent, SignalEvent). Develop mechanisms for publishing and consuming events from these streams, ensuring that events are processed in the correct order and are idempotent. Implement checkpoint management to track the last processed event, allowing for recovery in case of failures. Ensure that the system can handle event replay for debugging and recovery scenarios, providing a robust solution for event persistence.
+
+# Test Strategy:
+Verify the implementation by creating unit tests for Redis connection management, stream creation, and event publishing/consuming mechanisms. Conduct integration tests to ensure that events are persisted correctly in Redis and can be replayed accurately. Simulate failure scenarios to test the checkpoint management and recovery capabilities, ensuring that the system can recover to the last known good state without data loss.
+
+# Subtasks:
+## 1. Implement Redis Connection Management [pending]
+### Dependencies: None
+### Description: Develop a robust Redis connection management system that includes retry logic and connection pooling to ensure reliable connections to the Redis server.
+### Details:
+Use the redis-py library to create a connection pool. Implement retry logic using a decorator that retries connection attempts a specified number of times with exponential backoff. Ensure that connections are properly closed when no longer needed.
+
+## 2. Create Redis Streams for Event Types [pending]
+### Dependencies: 16.1
+### Description: Set up Redis Streams for each event type defined in Task 2: MarketDataEvent, OrderEvent, FillEvent, and SignalEvent.
+### Details:
+Utilize the Redis connection established in the previous subtask to create streams for each event type. Use the XGROUP command to create consumer groups for each stream to facilitate event consumption.
+
+## 3. Implement Event Publishing Mechanism [pending]
+### Dependencies: 16.2
+### Description: Develop a mechanism to publish events to the Redis Streams with proper serialization to Redis format.
+### Details:
+Create a function that takes an event object, serializes it to JSON format, and publishes it to the appropriate Redis Stream using the XADD command. Ensure that the function handles exceptions and logs errors appropriately.
+
+## 4. Implement Event Consumption with Acknowledgment [pending]
+### Dependencies: 16.3
+### Description: Create a system for consuming events from the Redis Streams with acknowledgment and error handling.
+### Details:
+Develop a consumer function that reads events from the stream using the XREADGROUP command. Implement acknowledgment of processed events using the XACK command. Include error handling to manage failed processing attempts and log errors.
+
+## 5. Implement Checkpoint Management and Event Replay [pending]
+### Dependencies: 16.4
+### Description: Develop a checkpoint management system to track the last processed event and implement event replay functionality for system recovery.
+### Details:
+Create a mechanism to store the ID of the last processed event in a persistent store (e.g., Redis or a database). Implement a replay function that can read from the stream starting from the last checkpoint, allowing for event replay in case of failures.
+
+## 6. Implement Dead Letter Queue for Failed Events [pending]
+### Dependencies: 16.4
+### Description: Create a robust dead letter queue system for handling events that fail processing, ensuring no critical trading data is lost
+### Details:
+Design separate Redis Stream for dead letter queue with configurable retention policy. Implement retry logic with exponential backoff (1s, 2s, 4s, 8s, 16s) before moving to DLQ. Create event failure classification: transient (retry), permanent (DLQ), poison (immediate DLQ). Add failure metadata: error message, stack trace, retry count, original timestamp. Implement DLQ monitoring with alerts for queue depth thresholds. Create manual replay mechanism for DLQ events after issue resolution. Design DLQ analytics to identify patterns in failures. Implement automatic DLQ draining for recovered transient failures.
+

@@ -1,7 +1,7 @@
 # Task ID: 4
 # Title: Build Multi-Source Data Aggregation System
 # Status: pending
-# Dependencies: 2
+# Dependencies: 16
 # Priority: high
 # Description: Implement a data aggregation system that supports multiple data sources.
 # Details:

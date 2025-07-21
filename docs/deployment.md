@@ -87,7 +87,7 @@ COPY config/ ./config/
 COPY pyproject.toml .
 
 # Create cache directory
-RUN mkdir -p cache/sqlite cache/logs cache/temp cache/redis
+RUN mkdir -p silver_cache/sqlite silver_cache/logs silver_cache/temp silver_cache/redis
 
 # Create non-root user
 RUN useradd -m -u 1000 silvertine && \
@@ -466,13 +466,13 @@ Import the provided Grafana dashboard for Silvertine metrics:
 ### 1. Data Backup
 ```bash
 # Database backup
-sqlite3 cache/sqlite/silvertine.db ".backup cache/backups/silvertine_$(date +%Y%m%d_%H%M%S).db"
+sqlite3 silver_cache/sqlite/silvertine.db ".backup silver_cache/backups/silvertine_$(date +%Y%m%d_%H%M%S).db"
 
 # Configuration backup
 tar -czf config_backup_$(date +%Y%m%d_%H%M%S).tar.gz config/
 
 # Redis backup
-redis-cli --rdb cache/backups/redis_$(date +%Y%m%d_%H%M%S).rdb
+redis-cli --rdb silver_cache/backups/redis_$(date +%Y%m%d_%H%M%S).rdb
 ```
 
 ### 2. Disaster Recovery Plan
@@ -504,7 +504,7 @@ redis-cli --rdb cache/backups/redis_$(date +%Y%m%d_%H%M%S).rdb
 4. **Configuration Issues**: Validate configuration files and environment variables
 
 ### Log Locations
-- **Application Logs**: `cache/logs/`
+- **Application Logs**: `silver_cache/logs/`
 - **System Logs**: `/var/log/syslog`
 - **Nginx Logs**: `/var/log/nginx/`
 - **Redis Logs**: `/var/log/redis/`

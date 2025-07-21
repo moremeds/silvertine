@@ -171,7 +171,7 @@ silvertine/
 │   ├── strategies/             # Strategy parameters
 │   ├── risk/                   # Risk management settings
 │   └── logging/                # Logging configuration
-├── cache/                      # Runtime data (gitignored)
+├── silver_cache/                      # Runtime data (gitignored)
 │   ├── sqlite/                 # SQLite databases
 │   ├── logs/                   # Application logs
 │   ├── progress/               # Session progress tracking
@@ -219,7 +219,7 @@ Silvertine includes an intelligent progress tracking system for session continui
 
 **Progress Structure**:
 ```bash
-cache/progress/
+silver_cache/progress/
 ├── session_progress.json      # Current session state
 ├── task_snapshots/           # Major milestone snapshots
 └── recovery/                 # Quick recovery information
