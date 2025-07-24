@@ -1,4 +1,29 @@
 {
-  "typeCheckingMode": "strict",
-  "reportMissingTypeStubs": "warning"
+    "include": [
+        "silvertine",
+        "tests"
+    ],
+    "exclude": [
+        "**/__pycache__",
+        "**/*.pyc",
+        ".pytest_cache",
+        ".mypy_cache", 
+        ".ruff_cache",
+        "htmlcov",
+        "silver_cache",
+        "scrapyard"
+    ],
+    "venvPath": "/home/ubuntu/.cache/pypoetry/virtualenvs",
+    "venv": "silvertine-5Agbv7sj-py3.10",
+    "pythonVersion": "3.10",
+    "typeCheckingMode": "basic",
+    "useLibraryCodeForTypes": true,
+    "autoImportCompletions": true,
+    "reportMissingImports": "warning",
+    "reportMissingTypeStubs": "none",
+    "reportUnknownParameterType": "none",
+    "reportUnknownArgumentType": "none",
+    "reportUnknownLambdaType": "none",
+    "reportUnknownVariableType": "none",
+    "reportUnknownMemberType": "none"
 }
