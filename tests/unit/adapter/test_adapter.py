@@ -14,7 +14,7 @@ from unittest.mock import Mock
 
 import pytest
 
-from silvertine.adapter.adapter import BaseAdapter
+from silvertine.adapter.base_adapter import BaseAdapter
 from silvertine.core.engine import EventEngine
 from silvertine.util.constants import Direction
 from silvertine.util.constants import Exchange

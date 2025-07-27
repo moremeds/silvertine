@@ -4,9 +4,11 @@ Unit tests for settings.py module.
 
 import unittest
 from logging import CRITICAL
-from unittest.mock import Mock, patch
+from unittest.mock import Mock
+from unittest.mock import patch
 
-from silvertine.util.settings import SETTINGS, SETTING_FILENAME
+from silvertine.util.settings import SETTING_FILENAME
+from silvertine.util.settings import SETTINGS
 
 
 class TestSettings(unittest.TestCase):
@@ -32,7 +34,7 @@ class TestSettings(unittest.TestCase):
 
         # Email settings
         email_keys = [
-            "email.server", "email.port", "email.username", 
+            "email.server", "email.port", "email.username",
             "email.password", "email.sender", "email.receiver"
         ]
         for key in email_keys:
@@ -103,7 +105,7 @@ class TestSettings(unittest.TestCase):
         # Since the module is already imported, we can't test the actual call
         # But we can verify the result is used correctly
         mock_get_localzone.return_value = "UTC"
-        
+
         # Import the module again to test (this is a bit tricky in unittest)
         # For this test, we'll just verify the structure is correct
         self.assertIn("database.timezone", SETTINGS)
@@ -122,9 +124,7 @@ class TestSettings(unittest.TestCase):
 
         # Re-import the module to test the update behavior
         # Since this is hard to do in unittest, we'll simulate it
-        import importlib
-        import silvertine.util.settings as settings_module
-        
+
         # Verify load_json was called with correct filename
         # Note: This might not work as expected due to import caching
         # In a real test, you'd want to use importlib.reload or similar
@@ -132,11 +132,11 @@ class TestSettings(unittest.TestCase):
     def test_settings_is_mutable_dict(self) -> None:
         """Test that SETTINGS can be modified."""
         original_font_size = SETTINGS["font.size"]
-        
+
         # Modify a setting
         SETTINGS["font.size"] = 16
         self.assertEqual(SETTINGS["font.size"], 16)
-        
+
         # Restore original value
         SETTINGS["font.size"] = original_font_size
         self.assertEqual(SETTINGS["font.size"], original_font_size)
@@ -168,7 +168,7 @@ class TestSettings(unittest.TestCase):
         """Test behavior when JSON loading fails."""
         # Mock load_json to raise an exception
         mock_load_json.side_effect = Exception("File not found")
-        
+
         # The module should still work with default settings
         # Since the module is already imported, we can't test this directly
         # But we can verify that the current settings are still valid
@@ -202,7 +202,7 @@ class TestSettings(unittest.TestCase):
             # Keys should contain at least one dot (category.setting)
             if key != "extra":  # Allow for potential extra keys
                 self.assertIn(".", key, f"Setting key '{key}' should contain a dot")
-                
+
                 # Keys should not start or end with dot
                 self.assertFalse(key.startswith("."), f"Key '{key}' should not start with dot")
                 self.assertFalse(key.endswith("."), f"Key '{key}' should not end with dot")

@@ -17,10 +17,6 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 from threading import Condition, Thread
 
-from .ib_mappings import (ACCOUNTFIELD_IB2VT, DIRECTION_IB2VT, EXCHANGE_VT2IB, PRODUCT_IB2VT, OPTION_IB2VT,
-                            ORDERTYPE_VT2IB, STATUS_IB2VT, EXCHANGE_IB2VT, ORDERTYPE_IB2VT, DIRECTION_VT2IB,
-                            TICKFIELD_IB2VT, INTERVAL_VT2IB, OPTION_IB2VT, PRODUCT_IB2VT, JOIN_SYMBOL)
-
 from ibapi.client import EClient
 from ibapi.common import BarData as IbBarData
 from ibapi.common import OrderId, TickAttrib, TickerId
@@ -31,17 +27,19 @@ from ibapi.order_cancel import OrderCancel
 from ibapi.order_state import OrderState
 from ibapi.ticktype import TickType, TickTypeEnum
 from ibapi.wrapper import EWrapper
-from tzlocal import get_localzone_name
-
 from silvertine.adapter.base_adapter import BaseAdapter
-from silvertine.core.event import EVENT_TIMER, Event
 from silvertine.core.engine import EventEngine
-from silvertine.util.constants import (Currency, Direction, Exchange, Interval,
-                                       OptionType, OrderType, Product, Status)
+from silvertine.core.event import EVENT_TIMER, Event
+from silvertine.util.constants import Direction, Exchange, OrderType, Product, Status
 from silvertine.util.object import (AccountData, BarData, CancelRequest, ContractData,
                                     HistoryRequest, OrderData, OrderRequest,
                                     PositionData, SubscribeRequest, TickData, TradeData)
 from silvertine.util.utility import ZoneInfo, get_file_path
+
+from .ib_mappings import (ACCOUNTFIELD_IB2VT, DIRECTION_IB2VT, DIRECTION_VT2IB,
+                          EXCHANGE_IB2VT, EXCHANGE_VT2IB, INTERVAL_VT2IB, JOIN_SYMBOL,
+                          OPTION_IB2VT, ORDERTYPE_IB2VT, ORDERTYPE_VT2IB, PRODUCT_IB2VT,
+                          STATUS_IB2VT, TICKFIELD_IB2VT)
 
 LOCAL_TZ = ZoneInfo("Asia/Shanghai")
 
@@ -853,7 +851,7 @@ class IbApi(EWrapper):
         order: OrderData = req.create_order_data(str(self.orderid), self.adapter_name)
         self.orders[order.orderid] = order
         self.adapter.on_order(order)
-        return order.vt_orderid     # type: ignore
+        return order.vt_orderid
 
     def cancel_order(self, req: CancelRequest) -> None:
         """Cancel an order"""

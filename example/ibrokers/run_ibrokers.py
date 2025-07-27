@@ -1,7 +1,6 @@
+from silvertine.adapter.ibrokers.ibrokers import IBAdapter
 from silvertine.core.engine import EventEngine
 from silvertine.server.engine import MainEngine
-
-from silvertine.adapter.ibrokers.ibrokers import IBAdapter
 
 
 def main() -> None:

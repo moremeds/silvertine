@@ -2,38 +2,36 @@
 Unit tests for utility.py module.
 """
 
-import json
-import tempfile
 import unittest
-from datetime import datetime, time
-from decimal import Decimal
-from pathlib import Path
-from unittest.mock import MagicMock, Mock, call, mock_open, patch
+from datetime import datetime
+from datetime import time
+from unittest.mock import MagicMock
+from unittest.mock import Mock
+from unittest.mock import mock_open
+from unittest.mock import patch
 
 import numpy as np
-import pytest
 
-from silvertine.util.constants import Exchange, Interval
-from silvertine.util.object import BarData, TickData
-from silvertine.util.utility import (
-    ArrayManager,
-    BarGenerator,
-    TEMP_DIR,
-    TRADER_DIR,
-    _get_trader_dir,
-    ceil_to,
-    extract_vt_symbol,
-    floor_to,
-    generate_vt_symbol,
-    get_digits,
-    get_file_path,
-    get_folder_path,
-    get_icon_path,
-    load_json,
-    round_to,
-    save_json,
-    virtual,
-)
+from silvertine.util.constants import Exchange
+from silvertine.util.constants import Interval
+from silvertine.util.object import BarData
+from silvertine.util.object import TickData
+from silvertine.util.utility import TEMP_DIR
+from silvertine.util.utility import ArrayManager
+from silvertine.util.utility import BarGenerator
+from silvertine.util.utility import _get_trader_dir
+from silvertine.util.utility import ceil_to
+from silvertine.util.utility import extract_vt_symbol
+from silvertine.util.utility import floor_to
+from silvertine.util.utility import generate_vt_symbol
+from silvertine.util.utility import get_digits
+from silvertine.util.utility import get_file_path
+from silvertine.util.utility import get_folder_path
+from silvertine.util.utility import get_icon_path
+from silvertine.util.utility import load_json
+from silvertine.util.utility import round_to
+from silvertine.util.utility import save_json
+from silvertine.util.utility import virtual
 
 
 class TestVTSymbolFunctions(unittest.TestCase):
@@ -170,11 +168,11 @@ class TestMathFunctions(unittest.TestCase):
         # Basic rounding
         self.assertEqual(round_to(1.234, 0.01), 1.23)
         self.assertEqual(round_to(1.236, 0.01), 1.24)
-        
+
         # Round to different targets
         self.assertEqual(round_to(12.34, 0.5), 12.5)
         self.assertEqual(round_to(12.24, 0.5), 12.0)
-        
+
         # Round to 1
         self.assertEqual(round_to(12.6, 1.0), 13.0)
         self.assertEqual(round_to(12.4, 1.0), 12.0)
@@ -184,11 +182,11 @@ class TestMathFunctions(unittest.TestCase):
         # Basic flooring
         self.assertEqual(floor_to(1.236, 0.01), 1.23)
         self.assertEqual(floor_to(1.234, 0.01), 1.23)
-        
+
         # Floor to different targets
         self.assertEqual(floor_to(12.74, 0.5), 12.5)
         self.assertEqual(floor_to(12.24, 0.5), 12.0)
-        
+
         # Floor to 1
         self.assertEqual(floor_to(12.9, 1.0), 12.0)
         self.assertEqual(floor_to(12.1, 1.0), 12.0)
@@ -198,11 +196,11 @@ class TestMathFunctions(unittest.TestCase):
         # Basic ceiling
         self.assertEqual(ceil_to(1.231, 0.01), 1.24)
         self.assertEqual(ceil_to(1.236, 0.01), 1.24)
-        
+
         # Ceil to different targets
         self.assertEqual(ceil_to(12.24, 0.5), 12.5)
         self.assertEqual(ceil_to(12.01, 0.5), 12.5)
-        
+
         # Ceil to 1
         self.assertEqual(ceil_to(12.1, 1.0), 13.0)
         self.assertEqual(ceil_to(12.9, 1.0), 13.0)
@@ -213,11 +211,11 @@ class TestMathFunctions(unittest.TestCase):
         self.assertEqual(get_digits(1.23), 2)
         self.assertEqual(get_digits(1.234567), 6)
         self.assertEqual(get_digits(1.0), 1)
-        
+
         # Scientific notation
         self.assertEqual(get_digits(1e-5), 5)
         self.assertEqual(get_digits(1e-10), 10)
-        
+
         # Integers
         self.assertEqual(get_digits(123), 0)
         self.assertEqual(get_digits(0), 0)
@@ -230,7 +228,7 @@ class TestBarGeneratorInit(unittest.TestCase):
         """Test basic BarGenerator initialization."""
         on_bar = Mock()
         generator = BarGenerator(on_bar)
-        
+
         self.assertIsNone(generator.bar)
         self.assertEqual(generator.on_bar, on_bar)
         self.assertEqual(generator.interval, Interval.MINUTE)
@@ -253,7 +251,7 @@ class TestBarGeneratorInit(unittest.TestCase):
             on_window_bar=on_window_bar,
             interval=Interval.HOUR
         )
-        
+
         self.assertEqual(generator.window, 5)
         self.assertEqual(generator.on_window_bar, on_window_bar)
         self.assertEqual(generator.interval, Interval.HOUR)
@@ -261,19 +259,19 @@ class TestBarGeneratorInit(unittest.TestCase):
     def test_init_daily_without_end_time_raises_error(self) -> None:
         """Test that daily interval without end time raises error."""
         on_bar = Mock()
-        
+
         with self.assertRaises(RuntimeError) as context:
             BarGenerator(on_bar, interval=Interval.DAILY)
-        
+
         self.assertIn("Synthetic daily K-line must pass in the daily closing time", str(context.exception))
 
     def test_init_daily_with_end_time(self) -> None:
         """Test daily interval with end time."""
         on_bar = Mock()
         daily_end = time(15, 0)
-        
+
         generator = BarGenerator(on_bar, interval=Interval.DAILY, daily_end=daily_end)
-        
+
         self.assertEqual(generator.daily_end, daily_end)
 
 
@@ -285,13 +283,13 @@ class TestBarGeneratorTickUpdate(unittest.TestCase):
         self.on_bar = Mock()
         self.generator = BarGenerator(self.on_bar)
 
-    def create_tick(self, symbol="BTCUSDT", exchange=Exchange.BINANCE, 
-                   datetime_obj=None, last_price=100.0, volume=1000.0, 
+    def create_tick(self, symbol="BTCUSDT", exchange=Exchange.BINANCE,
+                   datetime_obj=None, last_price=100.0, volume=1000.0,
                    turnover=100000.0, open_interest=0.0):
         """Helper to create tick data."""
         if datetime_obj is None:
             datetime_obj = datetime(2024, 1, 1, 10, 0, 0)
-        
+
         return TickData(
             symbol=symbol,
             exchange=exchange,
@@ -306,9 +304,9 @@ class TestBarGeneratorTickUpdate(unittest.TestCase):
     def test_update_tick_zero_price_filtered(self) -> None:
         """Test that ticks with zero last price are filtered."""
         tick = self.create_tick(last_price=0.0)
-        
+
         self.generator.update_tick(tick)
-        
+
         self.assertIsNone(self.generator.bar)
         self.on_bar.assert_not_called()
 
@@ -321,9 +319,9 @@ class TestBarGeneratorTickUpdate(unittest.TestCase):
             turnover=100000.0,
             open_interest=50.0
         )
-        
+
         self.generator.update_tick(tick)
-        
+
         self.assertIsNotNone(self.generator.bar)
         self.assertEqual(self.generator.bar.symbol, "BTCUSDT")
         self.assertEqual(self.generator.bar.exchange, Exchange.BINANCE)
@@ -343,7 +341,7 @@ class TestBarGeneratorTickUpdate(unittest.TestCase):
             volume=1000.0
         )
         self.generator.update_tick(tick1)
-        
+
         # Second tick in same minute with higher price
         tick2 = self.create_tick(
             datetime_obj=datetime(2024, 1, 1, 10, 30, 45),
@@ -351,7 +349,7 @@ class TestBarGeneratorTickUpdate(unittest.TestCase):
             volume=1100.0
         )
         self.generator.update_tick(tick2)
-        
+
         # Bar should be updated
         self.assertEqual(self.generator.bar.high_price, 105.0)
         self.assertEqual(self.generator.bar.low_price, 100.0)
@@ -366,21 +364,21 @@ class TestBarGeneratorTickUpdate(unittest.TestCase):
             last_price=100.0
         )
         self.generator.update_tick(tick1)
-        
+
         # Second tick in new minute
         tick2 = self.create_tick(
             datetime_obj=datetime(2024, 1, 1, 10, 31, 15),
             last_price=105.0
         )
         self.generator.update_tick(tick2)
-        
+
         # Previous bar should be pushed
         self.on_bar.assert_called_once()
         pushed_bar = self.on_bar.call_args[0][0]
         self.assertEqual(pushed_bar.close_price, 100.0)
         self.assertEqual(pushed_bar.datetime.second, 0)
         self.assertEqual(pushed_bar.datetime.microsecond, 0)
-        
+
         # New bar should be created
         self.assertEqual(self.generator.bar.open_price, 105.0)
         self.assertEqual(self.generator.bar.close_price, 105.0)
@@ -417,18 +415,18 @@ class TestArrayManager(unittest.TestCase):
         self.assertEqual(self.array_manager.count, 0)
         self.assertEqual(self.array_manager.size, 10)
         self.assertFalse(self.array_manager.inited)
-        
+
         # Check arrays are initialized with zeros
         self.assertEqual(len(self.array_manager.open_array), 10)
         self.assertTrue(np.array_equal(self.array_manager.open_array, np.zeros(10)))
 
     def test_update_bar_single(self) -> None:
         """Test updating with single bar."""
-        bar = self.create_bar(open_price=100.0, high_price=105.0, 
+        bar = self.create_bar(open_price=100.0, high_price=105.0,
                              low_price=95.0, close_price=102.0)
-        
+
         self.array_manager.update_bar(bar)
-        
+
         self.assertEqual(self.array_manager.count, 1)
         self.assertFalse(self.array_manager.inited)  # Not enough bars yet
         self.assertEqual(self.array_manager.open_array[-1], 100.0)
@@ -441,10 +439,10 @@ class TestArrayManager(unittest.TestCase):
         for i in range(10):
             bar = self.create_bar(close_price=100.0 + i)
             self.array_manager.update_bar(bar)
-        
+
         self.assertEqual(self.array_manager.count, 10)
         self.assertTrue(self.array_manager.inited)
-        
+
         # Check that the last value is correct
         self.assertEqual(self.array_manager.close_array[-1], 109.0)
         # Check that first value is correct
@@ -456,10 +454,10 @@ class TestArrayManager(unittest.TestCase):
         for i in range(12):
             bar = self.create_bar(close_price=100.0 + i)
             self.array_manager.update_bar(bar)
-        
+
         self.assertEqual(self.array_manager.count, 12)
         self.assertTrue(self.array_manager.inited)
-        
+
         # Check that old values are rolled out
         self.assertEqual(self.array_manager.close_array[0], 102.0)  # Was 100+2
         self.assertEqual(self.array_manager.close_array[-1], 111.0)  # Is 100+11
@@ -478,7 +476,7 @@ class TestArrayManager(unittest.TestCase):
                 open_interest=50.0 + i * 5
             )
             self.array_manager.update_bar(bar)
-        
+
         # Test properties return correct arrays
         self.assertTrue(np.array_equal(self.array_manager.open, self.array_manager.open_array))
         self.assertTrue(np.array_equal(self.array_manager.high, self.array_manager.high_array))
@@ -492,9 +490,9 @@ class TestArrayManager(unittest.TestCase):
     def test_sma_single_value(self, mock_sma: MagicMock) -> None:
         """Test SMA calculation returning single value."""
         mock_sma.return_value = np.array([10.0, 11.0, 12.0])
-        
+
         result = self.array_manager.sma(5, array=False)
-        
+
         mock_sma.assert_called_once_with(self.array_manager.close, 5)
         self.assertEqual(result, 12.0)
 
@@ -503,9 +501,9 @@ class TestArrayManager(unittest.TestCase):
         """Test SMA calculation returning array."""
         expected_array = np.array([10.0, 11.0, 12.0])
         mock_sma.return_value = expected_array
-        
+
         result = self.array_manager.sma(5, array=True)
-        
+
         mock_sma.assert_called_once_with(self.array_manager.close, 5)
         self.assertTrue(np.array_equal(result, expected_array))
 
@@ -516,9 +514,9 @@ class TestArrayManager(unittest.TestCase):
         signal_line = np.array([0.5, 1.5, 2.5])
         histogram = np.array([0.5, 0.5, 0.5])
         mock_macd.return_value = (macd_line, signal_line, histogram)
-        
+
         result = self.array_manager.macd(12, 26, 9, array=False)
-        
+
         mock_macd.assert_called_once_with(self.array_manager.close, 12, 26, 9)
         self.assertEqual(result, (3.0, 2.5, 0.5))
 
@@ -529,9 +527,9 @@ class TestArrayManager(unittest.TestCase):
         signal_line = np.array([0.5, 1.5, 2.5])
         histogram = np.array([0.5, 0.5, 0.5])
         mock_macd.return_value = (macd_line, signal_line, histogram)
-        
+
         result = self.array_manager.macd(12, 26, 9, array=True)
-        
+
         mock_macd.assert_called_once_with(self.array_manager.close, 12, 26, 9)
         self.assertEqual(len(result), 3)
         self.assertTrue(np.array_equal(result[0], macd_line))
@@ -551,9 +549,9 @@ class TestGetTraderDir(unittest.TestCase):
         mock_temp_path.exists.return_value = True
         mock_cwd_path.joinpath.return_value = mock_temp_path
         mock_cwd.return_value = mock_cwd_path
-        
+
         result = _get_trader_dir(".vntrader")
-        
+
         mock_cwd.assert_called_once()
         mock_cwd_path.joinpath.assert_called_once_with(".vntrader")
         mock_temp_path.exists.assert_called_once()
@@ -570,16 +568,16 @@ class TestGetTraderDir(unittest.TestCase):
         mock_cwd_temp_path.exists.return_value = False
         mock_cwd_path.joinpath.return_value = mock_cwd_temp_path
         mock_cwd.return_value = mock_cwd_path
-        
+
         # Home directory mocks
         mock_home_path = Mock()
         mock_home_temp_path = Mock()
         mock_home_temp_path.exists.return_value = True
         mock_home_path.joinpath.return_value = mock_home_temp_path
         mock_home.return_value = mock_home_path
-        
+
         result = _get_trader_dir(".vntrader")
-        
+
         mock_cwd.assert_called_once()
         mock_home.assert_called_once()
         mock_home_path.joinpath.assert_called_once_with(".vntrader")
@@ -597,16 +595,16 @@ class TestGetTraderDir(unittest.TestCase):
         mock_cwd_temp_path.exists.return_value = False
         mock_cwd_path.joinpath.return_value = mock_cwd_temp_path
         mock_cwd.return_value = mock_cwd_path
-        
+
         # Home directory mocks
         mock_home_path = Mock()
         mock_home_temp_path = Mock()
         mock_home_temp_path.exists.return_value = False
-        mock_home_path.joinpath.return_value = mock_home_temp_path  
+        mock_home_path.joinpath.return_value = mock_home_temp_path
         mock_home.return_value = mock_home_path
-        
+
         result = _get_trader_dir(".vntrader")
-        
+
         mock_cwd.assert_called_once()
         mock_home.assert_called_once()
         mock_home_path.joinpath.assert_called_once_with(".vntrader")
@@ -623,7 +621,7 @@ class TestBarGeneratorAdvanced(unittest.TestCase):
         self.on_bar = Mock()
         self.on_window_bar = Mock()
 
-    def create_bar(self, datetime_obj: datetime, open_price: float = 100.0, high_price: float = 105.0, 
+    def create_bar(self, datetime_obj: datetime, open_price: float = 100.0, high_price: float = 105.0,
                    low_price: float = 95.0, close_price: float = 102.0, volume: float = 1000.0) -> BarData:
         """Helper to create BarData objects."""
         return BarData(
@@ -646,55 +644,55 @@ class TestBarGeneratorAdvanced(unittest.TestCase):
         # Initialize with window to avoid division by zero
         generator = BarGenerator(self.on_bar, window=5, on_window_bar=self.on_window_bar)
         bar = self.create_bar(datetime(2024, 1, 1, 10, 0))
-        
+
         generator.update_bar(bar)
-        
+
         # Should not trigger window bar callback on first bar
         self.on_window_bar.assert_not_called()
 
     def test_update_bar_minute_window(self) -> None:
         """Test update_bar_minute_window functionality."""
         generator = BarGenerator(self.on_bar, window=5, on_window_bar=self.on_window_bar, interval=Interval.MINUTE)
-        
+
         # First bar - should not trigger window bar
         bar1 = self.create_bar(datetime(2024, 1, 1, 10, 0), close_price=100.0, volume=100.0)
         generator.update_bar_minute_window(bar1)
         self.on_window_bar.assert_not_called()
         self.assertIsNotNone(generator.window_bar)
-        
+
         # Add more bars to reach window size
         for i in range(1, 5):
             bar = self.create_bar(datetime(2024, 1, 1, 10, i), close_price=100.0 + i, volume=100.0)
             generator.update_bar_minute_window(bar)
-        
+
         # 5th bar should trigger window bar
         bar5 = self.create_bar(datetime(2024, 1, 1, 10, 5), close_price=105.0, volume=100.0)
         generator.update_bar_minute_window(bar5)
-        
+
         # Should have called window bar callback
         self.on_window_bar.assert_called_once()
 
     def test_update_bar_hour_window(self) -> None:
         """Test update_bar_hour_window functionality."""
         generator = BarGenerator(self.on_bar, window=2, on_window_bar=self.on_window_bar, interval=Interval.HOUR)
-        
+
         # Create a sequence of bars to complete the first hour
         # First initialize the hour with minute 0
         bar1_start = self.create_bar(datetime(2024, 1, 1, 10, 0), close_price=100.0, volume=50.0)
         generator.update_bar_hour_window(bar1_start)
-        
+
         # Complete the first hour with minute 59
         bar1_end = self.create_bar(datetime(2024, 1, 1, 10, 59), close_price=101.0, volume=50.0)
         generator.update_bar_hour_window(bar1_end)
         self.on_window_bar.assert_not_called()  # First hour completed, but window not complete yet
-        
+
         # Start and complete second hour
         bar2_start = self.create_bar(datetime(2024, 1, 1, 11, 0), close_price=102.0, volume=50.0)
         generator.update_bar_hour_window(bar2_start)
-        
+
         bar2_end = self.create_bar(datetime(2024, 1, 1, 11, 59), close_price=103.0, volume=50.0)
         generator.update_bar_hour_window(bar2_end)
-        
+
         self.on_window_bar.assert_called_once()  # Second hour completes window of 2
 
     def test_update_bar_daily_window(self) -> None:
@@ -702,28 +700,28 @@ class TestBarGeneratorAdvanced(unittest.TestCase):
         from datetime import time
         daily_end = time(15, 0)  # 3 PM closing time
         generator = BarGenerator(self.on_bar, window=2, on_window_bar=self.on_window_bar, interval=Interval.DAILY, daily_end=daily_end)
-        
+
         # First daily bar at closing time - should trigger callback immediately
         bar1 = self.create_bar(datetime(2024, 1, 1, 15, 0), close_price=100.0, volume=1000.0)
         generator.update_bar_daily_window(bar1)
         self.on_window_bar.assert_called_once()  # Daily window calls callback for each completed day
-        
+
         # Reset mock for second test
         self.on_window_bar.reset_mock()
-        
+
         # Second daily bar at closing time - should also trigger callback
         bar2 = self.create_bar(datetime(2024, 1, 2, 15, 0), close_price=102.0, volume=1000.0)
         generator.update_bar_daily_window(bar2)
-        
+
         self.on_window_bar.assert_called_once()  # Each completed day triggers callback
 
     def test_on_hour_bar(self) -> None:
         """Test on_hour_bar callback functionality."""
         generator = BarGenerator(self.on_bar, window=1, on_window_bar=self.on_window_bar)
         bar = self.create_bar(datetime(2024, 1, 1, 10, 0))
-        
+
         generator.on_hour_bar(bar)
-        
+
         # With window=1, should immediately call on_window_bar
         self.on_window_bar.assert_called_once_with(bar)
 
@@ -731,12 +729,12 @@ class TestBarGeneratorAdvanced(unittest.TestCase):
         """Test generate method calls callback immediately."""
         generator = BarGenerator(self.on_bar)
         bar = self.create_bar(datetime(2024, 1, 1, 10, 30))
-        
+
         # Set up a bar in the generator
         generator.bar = bar
-        
+
         generator.generate()
-        
+
         # Should call callback with the bar
         self.on_bar.assert_called_once()
         # Bar should be cleared after generation
@@ -771,9 +769,9 @@ class TestArrayManagerTechnicalIndicators(unittest.TestCase):
     def test_ema_single_value(self, mock_ema: MagicMock) -> None:
         """Test EMA calculation returning single value."""
         mock_ema.return_value = np.array([10.0, 11.0, 12.0])
-        
+
         result = self.array_manager.ema(14, array=False)
-        
+
         mock_ema.assert_called_once_with(self.array_manager.close, 14)
         self.assertEqual(result, 12.0)
 
@@ -782,9 +780,9 @@ class TestArrayManagerTechnicalIndicators(unittest.TestCase):
         """Test EMA calculation returning array."""
         expected_array = np.array([10.0, 11.0, 12.0])
         mock_ema.return_value = expected_array
-        
+
         result = self.array_manager.ema(14, array=True)
-        
+
         mock_ema.assert_called_once_with(self.array_manager.close, 14)
         self.assertTrue(np.array_equal(result, expected_array))
 
@@ -792,9 +790,9 @@ class TestArrayManagerTechnicalIndicators(unittest.TestCase):
     def test_rsi_single_value(self, mock_rsi: MagicMock) -> None:
         """Test RSI calculation returning single value."""
         mock_rsi.return_value = np.array([30.0, 45.0, 70.0])
-        
+
         result = self.array_manager.rsi(14, array=False)
-        
+
         mock_rsi.assert_called_once_with(self.array_manager.close, 14)
         self.assertEqual(result, 70.0)
 
@@ -803,9 +801,9 @@ class TestArrayManagerTechnicalIndicators(unittest.TestCase):
         """Test RSI calculation returning array."""
         expected_array = np.array([30.0, 45.0, 70.0])
         mock_rsi.return_value = expected_array
-        
+
         result = self.array_manager.rsi(14, array=True)
-        
+
         mock_rsi.assert_called_once_with(self.array_manager.close, 14)
         self.assertTrue(np.array_equal(result, expected_array))
 
@@ -813,9 +811,9 @@ class TestArrayManagerTechnicalIndicators(unittest.TestCase):
     def test_atr_single_value(self, mock_atr: MagicMock) -> None:
         """Test ATR calculation returning single value."""
         mock_atr.return_value = np.array([1.0, 1.2, 1.5])
-        
+
         result = self.array_manager.atr(14, array=False)
-        
+
         mock_atr.assert_called_once_with(self.array_manager.high, self.array_manager.low, self.array_manager.close, 14)
         self.assertEqual(result, 1.5)
 
@@ -824,9 +822,9 @@ class TestArrayManagerTechnicalIndicators(unittest.TestCase):
         """Test ATR calculation returning array."""
         expected_array = np.array([1.0, 1.2, 1.5])
         mock_atr.return_value = expected_array
-        
+
         result = self.array_manager.atr(14, array=True)
-        
+
         mock_atr.assert_called_once_with(self.array_manager.high, self.array_manager.low, self.array_manager.close, 14)
         self.assertTrue(np.array_equal(result, expected_array))
 
@@ -835,9 +833,9 @@ class TestArrayManagerTechnicalIndicators(unittest.TestCase):
     def test_cci_single_value(self, mock_cci: MagicMock) -> None:
         """Test CCI calculation returning single value."""
         mock_cci.return_value = np.array([-100.0, 0.0, 100.0])
-        
+
         result = self.array_manager.cci(14, array=False)
-        
+
         mock_cci.assert_called_once_with(self.array_manager.high, self.array_manager.low, self.array_manager.close, 14)
         self.assertEqual(result, 100.0)
 
@@ -845,9 +843,9 @@ class TestArrayManagerTechnicalIndicators(unittest.TestCase):
     def test_kama_single_value(self, mock_kama: MagicMock) -> None:
         """Test KAMA calculation returning single value."""
         mock_kama.return_value = np.array([98.0, 99.0, 100.0])
-        
+
         result = self.array_manager.kama(14, array=False)
-        
+
         mock_kama.assert_called_once_with(self.array_manager.close, 14)
         self.assertEqual(result, 100.0)
 
@@ -855,9 +853,9 @@ class TestArrayManagerTechnicalIndicators(unittest.TestCase):
     def test_wma_single_value(self, mock_wma: MagicMock) -> None:
         """Test WMA calculation returning single value."""
         mock_wma.return_value = np.array([98.0, 99.0, 100.0])
-        
+
         result = self.array_manager.wma(14, array=False)
-        
+
         mock_wma.assert_called_once_with(self.array_manager.close, 14)
         self.assertEqual(result, 100.0)
 
@@ -865,9 +863,9 @@ class TestArrayManagerTechnicalIndicators(unittest.TestCase):
     def test_std_single_value(self, mock_std: MagicMock) -> None:
         """Test Standard Deviation calculation returning single value."""
         mock_std.return_value = np.array([1.0, 1.2, 1.5])
-        
+
         result = self.array_manager.std(14, array=False)
-        
+
         mock_std.assert_called_once_with(self.array_manager.close, 14, 1)
         self.assertEqual(result, 1.5)
 
@@ -875,9 +873,9 @@ class TestArrayManagerTechnicalIndicators(unittest.TestCase):
     def test_obv_single_value(self, mock_obv: MagicMock) -> None:
         """Test OBV calculation returning single value."""
         mock_obv.return_value = np.array([1000.0, 2000.0, 3000.0])
-        
+
         result = self.array_manager.obv(array=False)
-        
+
         mock_obv.assert_called_once_with(self.array_manager.close, self.array_manager.volume)
         self.assertEqual(result, 3000.0)
 
@@ -885,14 +883,14 @@ class TestArrayManagerTechnicalIndicators(unittest.TestCase):
     def test_mfi_single_value(self, mock_mfi: MagicMock) -> None:
         """Test MFI calculation returning single value."""
         mock_mfi.return_value = np.array([20.0, 50.0, 80.0])
-        
+
         result = self.array_manager.mfi(14, array=False)
-        
+
         mock_mfi.assert_called_once_with(
-            self.array_manager.high, 
-            self.array_manager.low, 
-            self.array_manager.close, 
-            self.array_manager.volume, 
+            self.array_manager.high,
+            self.array_manager.low,
+            self.array_manager.close,
+            self.array_manager.volume,
             14
         )
         self.assertEqual(result, 80.0)
@@ -901,9 +899,9 @@ class TestArrayManagerTechnicalIndicators(unittest.TestCase):
     def test_natr_single_value(self, mock_natr: MagicMock) -> None:
         """Test NATR calculation returning single value."""
         mock_natr.return_value = np.array([1.0, 1.2, 1.5])
-        
+
         result = self.array_manager.natr(14, array=False)
-        
+
         mock_natr.assert_called_once_with(self.array_manager.high, self.array_manager.low, self.array_manager.close, 14)
         self.assertEqual(result, 1.5)
 
@@ -911,9 +909,9 @@ class TestArrayManagerTechnicalIndicators(unittest.TestCase):
     def test_trange_single_value(self, mock_trange: MagicMock) -> None:
         """Test TRANGE calculation returning single value."""
         mock_trange.return_value = np.array([1.0, 1.2, 1.5])
-        
+
         result = self.array_manager.trange(array=False)
-        
+
         mock_trange.assert_called_once_with(self.array_manager.high, self.array_manager.low, self.array_manager.close)
         self.assertEqual(result, 1.5)
 
@@ -921,9 +919,9 @@ class TestArrayManagerTechnicalIndicators(unittest.TestCase):
     def test_roc_single_value(self, mock_roc: MagicMock) -> None:
         """Test ROC calculation returning single value."""
         mock_roc.return_value = np.array([1.0, 2.0, 3.0])
-        
+
         result = self.array_manager.roc(10, array=False)
-        
+
         mock_roc.assert_called_once_with(self.array_manager.close, 10)
         self.assertEqual(result, 3.0)
 
@@ -931,9 +929,9 @@ class TestArrayManagerTechnicalIndicators(unittest.TestCase):
     def test_cmo_single_value(self, mock_cmo: MagicMock) -> None:
         """Test CMO calculation returning single value."""
         mock_cmo.return_value = np.array([10.0, 20.0, 30.0])
-        
+
         result = self.array_manager.cmo(14, array=False)
-        
+
         mock_cmo.assert_called_once_with(self.array_manager.close, 14)
         self.assertEqual(result, 30.0)
 
@@ -945,9 +943,9 @@ class TestVirtualDecorator(unittest.TestCase):
         """Test that virtual decorator returns the function unchanged."""
         def test_function():
             return "test"
-        
+
         decorated_function = virtual(test_function)
-        
+
         self.assertEqual(decorated_function, test_function)
         self.assertEqual(decorated_function(), "test")
 
